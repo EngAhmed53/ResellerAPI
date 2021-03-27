@@ -8,7 +8,8 @@ import java.lang.IllegalArgumentException
 
 interface RelationDao {
     fun createNewRelation(relation: Relation)
-    fun getRelatedIdsOfType(type: EntityType): RelationDaoImpl.RelationFilter
+    fun getIdsOfRelationType(type: EntityType): RelationDaoImpl.RelationFilter
+    fun deleteRelationsOfType(companyUID: String, type: EntityType, vararg ids: Int)
 }
 
 object RelationDaoImpl : IntIdTable(), RelationDao {
@@ -32,13 +33,27 @@ object RelationDaoImpl : IntIdTable(), RelationDao {
         }
     }
 
-    override fun getRelatedIdsOfType(type: EntityType): RelationFilter {
+    override fun getIdsOfRelationType(type: EntityType): RelationFilter {
         return RelationFilter(type)
     }
 
+    override fun deleteRelationsOfType(companyUID: String, type: EntityType, vararg ids: Int) {
+        val idsList = ids.toList()
+        deleteWhere {
+            (companyId eq companyId) and (entityType eq type) and (when (type) {
+                EntityType.COMPANY -> throw IllegalArgumentException("$type is not allowed here")
+                EntityType.BRANCH -> branchId inList idsList
+                EntityType.SALESMAN -> salesmanId inList idsList
+                EntityType.CUSTOMER -> customerId inList idsList
+                EntityType.INVOICE -> invoiceId inList idsList
+            })
+        }
+    }
+
+
     class RelationFilter(private val requiredType: EntityType) {
 
-        fun by(companyUID: String): List<Int> {
+        fun filterBy(companyUID: String): List<Int> {
             return select {
                 (companyId eq companyUID) and (entityType eq requiredType)
             }.mapNotNull {
@@ -46,21 +61,21 @@ object RelationDaoImpl : IntIdTable(), RelationDao {
             }
         }
 
-        fun by(companyUID: String, type: EntityType, typeId: Int): List<Int> {
+        fun filterBy(companyUID: String, filterType: EntityType, filterTypeId: Int): List<Int> {
             return select {
-                (companyId eq companyUID) and (entityType eq requiredType) and (when (type) {
-                    EntityType.COMPANY -> throw IllegalArgumentException("$type is not allowed here")
-                    EntityType.BRANCH -> branchId eq typeId
-                    EntityType.SALESMAN -> salesmanId eq typeId
-                    EntityType.CUSTOMER -> customerId eq typeId
-                    EntityType.INVOICE -> invoiceId eq typeId
+                (companyId eq companyUID) and (entityType eq requiredType) and (when (filterType) {
+                    EntityType.COMPANY -> throw IllegalArgumentException("$filterType is not allowed here")
+                    EntityType.BRANCH -> branchId eq filterTypeId
+                    EntityType.SALESMAN -> salesmanId eq filterTypeId
+                    EntityType.CUSTOMER -> customerId eq filterTypeId
+                    EntityType.INVOICE -> invoiceId eq filterTypeId
                 })
             }.mapNotNull {
-               it.toIdOf(requiredType)
+                it.toIdOf(requiredType)
             }
         }
 
-        private fun ResultRow.toIdOf(type: EntityType): Int?{
+        private fun ResultRow.toIdOf(type: EntityType): Int? {
             return when (type) {
                 EntityType.BRANCH -> this[branchId]
                 EntityType.SALESMAN -> this[salesmanId]
