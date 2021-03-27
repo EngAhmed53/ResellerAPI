@@ -40,7 +40,7 @@ object RelationDaoImpl : IntIdTable(), RelationDao {
     override fun deleteRelationsOfType(companyUID: String, type: EntityType, vararg ids: Int) {
         val idsList = ids.toList()
         deleteWhere {
-            (companyId eq companyId) and (entityType eq type) and (when (type) {
+            (companyId eq companyUID) and (entityType eq type) and (when (type) {
                 EntityType.COMPANY -> throw IllegalArgumentException("$type is not allowed here")
                 EntityType.BRANCH -> branchId inList idsList
                 EntityType.SALESMAN -> salesmanId inList idsList
