@@ -1,4 +1,4 @@
-package com.reseller.ars.data.database.dao
+package com.reseller.ars.domain.datasource.database.dao
 
 import com.reseller.ars.data.model.Company
 import com.reseller.ars.data.model.License
@@ -9,16 +9,16 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 
 interface CompanyDao {
-    fun insertCompany(pushCompany: Company): Int
+    fun insertCompany(company: Company): String
 
     fun getCompanyByUID(companyUID: String): Company?
 
-    fun disableCompany(companyUID: String): Company?
+    fun disableCompany(companyUID: String): Boolean
 
-    fun extendCompanyLicense(companyUID: String, license: License): Company?
+    fun extendCompanyLicense(companyUID: String, license: License): Boolean
 }
 
-class CompanyDaoImpl : IntIdTable(), CompanyDao {
+object CompanyDaoImpl : IntIdTable(), CompanyDao {
 
     val createdAt = long("created_at").default(System.currentTimeMillis())
     val updatedAt = long("updated_at").default(System.currentTimeMillis())
@@ -34,19 +34,19 @@ class CompanyDaoImpl : IntIdTable(), CompanyDao {
     val enabled = bool("enabled").default(true)
     val licenseExpire = long("license_expire")
 
-    override fun insertCompany(pushCompany: Company): Int {
+    override fun insertCompany(company: Company): String {
         return insert {
-            it[uid] = pushCompany.uid
-            it[ownerName] = pushCompany.ownerName
-            it[ownerId] = pushCompany.ownerId
-            it[ownerPhone] = pushCompany.ownerPhone
-            it[ownerMail] = pushCompany.ownerMail
-            it[name] = pushCompany.name
-            it[email] = pushCompany.email
-            it[city] = pushCompany.city
-            it[country] = pushCompany.country
-            it[licenseExpire] = pushCompany.licenseExpire
-        }[id].value
+            it[uid] = company.uid
+            it[ownerName] = company.ownerName
+            it[ownerId] = company.ownerId
+            it[ownerPhone] = company.ownerPhone
+            it[ownerMail] = company.ownerMail
+            it[name] = company.name
+            it[email] = company.email
+            it[city] = company.city
+            it[country] = company.country
+            it[licenseExpire] = company.licenseExpire
+        }[uid]
     }
 
     override fun getCompanyByUID(companyUID: String): Company? {
@@ -72,22 +72,18 @@ class CompanyDaoImpl : IntIdTable(), CompanyDao {
             licenseExpire = this[licenseExpire]
         )
 
-    override fun disableCompany(companyUID: String): Company? {
-        update({ uid eq companyUID }) {
+    override fun disableCompany(companyUID: String): Boolean {
+        return update({ uid eq companyUID }) {
             it[updatedAt] = System.currentTimeMillis()
             it[enabled] = false
-        }
-
-        return getCompanyByUID(companyUID)
+        } > 0
     }
 
-    override fun extendCompanyLicense(companyUID: String, license: License): Company? {
-        update({ uid eq companyUID }) {
+    override fun extendCompanyLicense(companyUID: String, license: License): Boolean {
+        return update({ uid eq companyUID }) {
             it[updatedAt] = System.currentTimeMillis()
             it[licenseExpire] = license.licenseExpire
-            it[enabled] = license.enabled
-        }
-
-        return getCompanyByUID(companyUID)
+            it[enabled] = license.isEnabled
+        } > 0
     }
 }

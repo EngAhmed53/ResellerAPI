@@ -1,20 +1,21 @@
-package com.reseller.ars.data.database.dao
+package com.reseller.ars.domain.datasource.database.dao
 
 import com.reseller.ars.data.model.EntityType
 import com.reseller.ars.data.model.Relation
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
+import org.koin.core.KoinComponent
 import java.lang.IllegalArgumentException
 
 interface RelationDao {
-    fun createNewRelation(relation: Relation)
+    fun createNewRelation(relation: Relation): Int
 
     //fun getIdsOfRelationType(type: EntityType): RelationDaoImpl.RelationFilter
 
-    fun deleteRelationsOfType(companyUID: String, type: EntityType, vararg ids: Int)
+    fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean
 }
 
-object RelationDaoImpl : IntIdTable(), RelationDao {
+object RelationDaoImpl : IntIdTable(), RelationDao, KoinComponent {
     val createdAt = long("created_at").default(System.currentTimeMillis())
     val updatedAt = long("updated_at").default(System.currentTimeMillis())
     val entityType = enumerationByName("type", 50, EntityType::class)
@@ -24,24 +25,24 @@ object RelationDaoImpl : IntIdTable(), RelationDao {
     val customerId = integer("customer_id").nullable()
     val invoiceId = integer("invoice_id").nullable()
 
-    override fun createNewRelation(relation: Relation) {
-        insert {
+    override fun createNewRelation(relation: Relation): Int {
+        return insert {
             it[entityType] = relation.type
             it[companyId] = relation.companyId
             it[branchId] = relation.branchId
             it[salesmanId] = relation.salesmanId
             it[customerId] = relation.customerId
             it[invoiceId] = relation.invoiceId
-        }
+        }[id].value
     }
 
 //    override fun getIdsOfRelationType(type: EntityType): RelationFilter {
 //        return RelationFilter(type)
 //    }
 
-    override fun deleteRelationsOfType(companyUID: String, type: EntityType, vararg ids: Int) {
+    override fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean {
         val idsList = ids.toList()
-        deleteWhere {
+        return deleteWhere {
             (companyId eq companyUID) and (entityType eq type) and (when (type) {
                 EntityType.COMPANY -> throw IllegalArgumentException("$type is not allowed here")
                 EntityType.BRANCH -> branchId inList idsList
@@ -49,7 +50,7 @@ object RelationDaoImpl : IntIdTable(), RelationDao {
                 EntityType.CUSTOMER -> customerId inList idsList
                 EntityType.INVOICE -> invoiceId inList idsList
             })
-        }
+        } > 0
     }
 
 //    class RelationFilter(private val requiredType: EntityType) {

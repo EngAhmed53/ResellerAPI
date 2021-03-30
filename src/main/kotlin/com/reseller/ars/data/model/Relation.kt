@@ -1,6 +1,8 @@
 package com.reseller.ars.data.model
 
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class EntityType {
     COMPANY,
     BRANCH,
@@ -9,6 +11,7 @@ enum class EntityType {
     INVOICE
 }
 
+@Serializable
 data class Relation(
     val type: EntityType,
     val companyId: String,
