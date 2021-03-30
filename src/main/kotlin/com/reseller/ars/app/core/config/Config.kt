@@ -1,4 +1,4 @@
-package com.reseller.ars.app.config
+package com.reseller.ars.app.core.config
 
 class Config(
     val host: String,
