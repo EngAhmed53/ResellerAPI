@@ -12,7 +12,7 @@ interface RelationDao {
 
     //fun getIdsOfRelationType(type: EntityType): RelationDaoImpl.RelationFilter
 
-    fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean
+    fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: String): Boolean
 }
 
 object RelationDaoImpl : IntIdTable(), RelationDao, KoinComponent {
@@ -20,10 +20,10 @@ object RelationDaoImpl : IntIdTable(), RelationDao, KoinComponent {
     val updatedAt = long("updated_at").default(System.currentTimeMillis())
     val entityType = enumerationByName("type", 50, EntityType::class)
     val companyId = varchar("company_id", 200)
-    val branchId = integer("branch_id").nullable()
-    val salesmanId = integer("salesman_id").nullable()
-    val customerId = integer("customer_id").nullable()
-    val invoiceId = integer("invoice_id").nullable()
+    val branchId = varchar("branch_id", 200).nullable()
+    val salesmanId = varchar("salesman_id", 200).nullable()
+    val customerId = varchar("customer_id", 200).nullable()
+    val invoiceId = varchar("invoice_id", 200).nullable()
 
     override fun createNewRelation(relation: Relation): Int {
         return insert {
@@ -40,7 +40,7 @@ object RelationDaoImpl : IntIdTable(), RelationDao, KoinComponent {
 //        return RelationFilter(type)
 //    }
 
-    override fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean {
+    override fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: String): Boolean {
         val idsList = ids.toList()
         return deleteWhere {
             (companyId eq companyUID) and (entityType eq type) and (when (type) {

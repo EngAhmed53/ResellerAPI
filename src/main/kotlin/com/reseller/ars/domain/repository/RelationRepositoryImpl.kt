@@ -14,7 +14,7 @@ class RelationRepositoryImpl : RelationRepository, KoinComponent {
        return relationDao.createNewRelation(relation)
     }
 
-    override fun deleteRelation(companyUId: String, type: EntityType, relationId: Int): Boolean{
-        return relationDao.deleteRelationsTypeByCompanyId(companyUId, type, relationId)
+    override fun deleteRelation(companyUId: String, type: EntityType, vararg relationId: String): Boolean{
+        return relationDao.deleteRelationsTypeByCompanyId(companyUId, type, *relationId)
     }
 }
