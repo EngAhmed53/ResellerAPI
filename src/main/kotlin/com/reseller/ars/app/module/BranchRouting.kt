@@ -20,7 +20,7 @@ fun Routing.branchRouting() {
 
     route("/company") {
 
-        post("{uid}/branch") {
+        post("/{uid}/branch") {
             val companyUID = call.getCompanyUID() ?: return@post call.respond(
                 status = HttpStatusCode.BadRequest, message = "Missing or malformed uid"
             )
@@ -44,7 +44,7 @@ fun Routing.branchRouting() {
                 status = HttpStatusCode.BadRequest, message = "Missing or malformed uid"
             )
 
-            val parameters = call.receiveParameters()
+            val parameters = call.request.queryParameters
             val lastId = parameters["lastId"]?.toInt() ?: 0
             val offset = parameters["offset"]?.toInt() ?: 5
 
