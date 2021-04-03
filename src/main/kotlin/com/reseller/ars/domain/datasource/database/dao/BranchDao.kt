@@ -1,22 +1,20 @@
 package com.reseller.ars.domain.datasource.database.dao
 
 import com.reseller.ars.data.model.Branch
-import com.reseller.ars.data.model.Company
 import com.reseller.ars.data.model.EntityType
 import com.reseller.ars.data.model.PutBranch
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.*
 import java.util.*
 
 interface BranchDao {
-    fun insertBranch(companyUID: String, branch: Branch): String
+    fun insertBranch(companyUID: String, branch: Branch): Int
 
     fun selectBranchById(branchId: Int): Branch?
 
-    fun selectBranchesByCompanyUID(companyUID: String): List<Branch>
+    fun selectBranchesByCompanyUID(companyUID: String, lastId: Int, offset: Int): List<Branch>
 
-    fun updateBranch(putBranch: PutBranch): Boolean
+    fun updateBranch(branchId: Int, putBranch: PutBranch): Boolean
 
     fun deleteBranch(branchId: Int): Boolean
 }
@@ -29,13 +27,12 @@ object BranchDaoImpl : IntIdTable(), BranchDao {
     val city = varchar("city", 100)
     val country = varchar("country", 100)
 
-    override fun insertBranch(companyUID: String, branch: Branch): String {
+    override fun insertBranch(companyUID: String, branch: Branch): Int {
         return insert {
             it[name] = branch.name
             it[city] = branch.city
             it[country] = branch.country
-        }[id].value.toString()
-
+        }[id].value
     }
 
     override fun selectBranchById(branchId: Int): Branch? {
@@ -46,7 +43,7 @@ object BranchDaoImpl : IntIdTable(), BranchDao {
         }.singleOrNull()
     }
 
-    override fun selectBranchesByCompanyUID(companyUID: String): List<Branch> {
+    override fun selectBranchesByCompanyUID(companyUID: String, lastId: Int, offset: Int): List<Branch> {
         val complexJoin = Join(
             this, otherTable = RelationDaoImpl,
             onColumn = id, otherColumn = RelationDaoImpl.branchId,
@@ -56,7 +53,8 @@ object BranchDaoImpl : IntIdTable(), BranchDao {
             },
         )
 
-        return complexJoin.slice(name, city, country).selectAll().mapNotNull {
+        return complexJoin.slice(name, city, country).select { (id greater lastId) }.limit(offset)
+            .orderBy(id to SortOrder.ASC).mapNotNull {
             it.mapRowToBranch()
         }
     }
@@ -68,8 +66,8 @@ object BranchDaoImpl : IntIdTable(), BranchDao {
             country = this[country]
         )
 
-    override fun updateBranch(putBranch: PutBranch): Boolean {
-        return update({ id eq putBranch.branchId }) { branch ->
+    override fun updateBranch(branchId: Int, putBranch: PutBranch): Boolean {
+        return update({ id eq branchId }) { branch ->
             branch[updatedAt] = System.currentTimeMillis()
             putBranch.name?.let { branch[name] = it }
             putBranch.city?.let { branch[city] = it }

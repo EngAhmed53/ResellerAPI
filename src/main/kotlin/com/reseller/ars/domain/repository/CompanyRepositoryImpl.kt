@@ -25,4 +25,8 @@ class CompanyRepositoryImpl : CompanyRepository, KoinComponent {
     override fun extendCompanyLicense(companyUID: String, license: License): Boolean {
         return companyDao.extendCompanyLicense(companyUID, license)
     }
+
+    override fun isCompanyEnabled(companyUID: String): Boolean {
+        return companyDao.isCompanyEnabled(companyUID)
+    }
 }

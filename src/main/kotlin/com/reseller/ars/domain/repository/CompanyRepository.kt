@@ -11,4 +11,6 @@ interface CompanyRepository {
     fun disableCompany(companyUID: String): Boolean
 
     fun extendCompanyLicense(companyUID: String, license: License): Boolean
+
+    fun isCompanyEnabled(companyUID: String): Boolean
 }

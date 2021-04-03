@@ -12,7 +12,6 @@ data class Branch(
 
 @Serializable
 data class PutBranch(
-    val branchId: Int,
     val name: String?,
     val city:String?,
     val country: String?

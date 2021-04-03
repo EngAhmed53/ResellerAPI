@@ -1,6 +1,7 @@
 package com.reseller.ars.app
 
 import com.reseller.ars.app.module.adminRouting
+import com.reseller.ars.app.module.branchRouting
 import com.reseller.ars.app.module.companyRouting
 import com.reseller.ars.domain.datasource.database.DatabaseProvider
 import com.reseller.ars.domain.di.ControllerInjection
@@ -55,6 +56,7 @@ fun Application.main(testing: Boolean = false) {
 
         adminRouting()
         companyRouting()
+        branchRouting()
     }
 }
 

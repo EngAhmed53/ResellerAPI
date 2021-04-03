@@ -16,6 +16,8 @@ interface CompanyDao {
     fun disableCompany(companyUID: String): Boolean
 
     fun extendCompanyLicense(companyUID: String, license: License): Boolean
+
+    fun isCompanyEnabled(companyUID: String): Boolean
 }
 
 object CompanyDaoImpl : IntIdTable(), CompanyDao {
@@ -85,5 +87,9 @@ object CompanyDaoImpl : IntIdTable(), CompanyDao {
             it[licenseExpire] = license.licenseExpire
             it[enabled] = license.isEnabled
         } > 0
+    }
+
+    override fun isCompanyEnabled(companyUID: String): Boolean {
+        return getCompanyByUID(companyUID)?.enabled ?: false
     }
 }
