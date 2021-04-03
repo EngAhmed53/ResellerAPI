@@ -15,9 +15,9 @@ enum class EntityType {
 data class Relation(
     val type: EntityType,
     val companyId: String,
-    val branchId: String? = null,
-    val salesmanId: String? = null,
-    val customerId: String? = null,
-    val invoiceId: String? = null
+    val branchId: Int? = null,
+    val salesmanId: Int? = null,
+    val customerId: Int? = null,
+    val invoiceId: Int? = null
 )
 

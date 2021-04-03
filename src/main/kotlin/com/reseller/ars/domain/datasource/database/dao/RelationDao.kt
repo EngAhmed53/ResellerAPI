@@ -2,28 +2,30 @@ package com.reseller.ars.domain.datasource.database.dao
 
 import com.reseller.ars.data.model.EntityType
 import com.reseller.ars.data.model.Relation
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
 import org.koin.core.KoinComponent
 import java.lang.IllegalArgumentException
+import java.util.*
 
 interface RelationDao {
     fun createNewRelation(relation: Relation): Int
 
     //fun getIdsOfRelationType(type: EntityType): RelationDaoImpl.RelationFilter
 
-    fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: String): Boolean
+    fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean
 }
 
 object RelationDaoImpl : IntIdTable(), RelationDao, KoinComponent {
     val createdAt = long("created_at").default(System.currentTimeMillis())
     val updatedAt = long("updated_at").default(System.currentTimeMillis())
     val entityType = enumerationByName("type", 50, EntityType::class)
-    val companyId = varchar("company_id", 200)
-    val branchId = varchar("branch_id", 200).nullable()
-    val salesmanId = varchar("salesman_id", 200).nullable()
-    val customerId = varchar("customer_id", 200).nullable()
-    val invoiceId = varchar("invoice_id", 200).nullable()
+    val companyId = reference("company_id", CompanyDaoImpl.uid)
+    val branchId = integer(name = "branch_id").references(BranchDaoImpl.id).nullable()
+    val salesmanId = integer("salesman_id").nullable()
+    val customerId = integer("customer_id").nullable()
+    val invoiceId = integer("invoice_id").nullable()
 
     override fun createNewRelation(relation: Relation): Int {
         return insert {
@@ -40,7 +42,7 @@ object RelationDaoImpl : IntIdTable(), RelationDao, KoinComponent {
 //        return RelationFilter(type)
 //    }
 
-    override fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: String): Boolean {
+    override fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean {
         val idsList = ids.toList()
         return deleteWhere {
             (companyId eq companyUID) and (entityType eq type) and (when (type) {
