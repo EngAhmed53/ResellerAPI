@@ -46,9 +46,9 @@ fun Routing.branchRouting() {
 
             val parameters = call.request.queryParameters
             val lastId = parameters["lastId"]?.toInt() ?: 0
-            val offset = parameters["offset"]?.toInt() ?: 5
+            val size = parameters["size"]?.toInt() ?: 5
 
-            when (val result = branchController.getCompanyBranches(companyUID, lastId = lastId, offset = offset)) {
+            when (val result = branchController.getCompanyBranches(companyUID, lastId = lastId, size = size)) {
                 is Result.Success -> {
                     call.respond(HttpStatusCode.Created, result.data)
                 }

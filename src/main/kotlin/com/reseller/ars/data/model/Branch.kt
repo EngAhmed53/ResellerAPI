@@ -16,3 +16,11 @@ data class PutBranch(
     val city: String? = null,
     val country: String? = null
 )
+
+@Serializable
+data class ResponseBranch(
+    val id: Int,
+    val name: String,
+    val city: String,
+    val country: String
+)

@@ -3,16 +3,16 @@ package com.reseller.ars.domain.datasource.database.dao
 import com.reseller.ars.data.model.Branch
 import com.reseller.ars.data.model.EntityType
 import com.reseller.ars.data.model.PutBranch
+import com.reseller.ars.data.model.ResponseBranch
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
-import java.util.*
 
 interface BranchDao {
     fun insertBranch(companyUID: String, branch: Branch): Int
 
-    fun selectBranchById(branchId: Int): Branch?
+    fun selectBranchById(branchId: Int): ResponseBranch?
 
-    fun selectBranchesByCompanyUID(companyUID: String, lastId: Int, offset: Int): List<Branch>
+    fun selectBranchesByCompanyUID(companyUID: String, lastId: Int, size: Int): List<ResponseBranch>
 
     fun updateBranch(branchId: Int, putBranch: PutBranch): Boolean
 
@@ -35,15 +35,15 @@ object BranchDaoImpl : IntIdTable(), BranchDao {
         }[id].value
     }
 
-    override fun selectBranchById(branchId: Int): Branch? {
+    override fun selectBranchById(branchId: Int): ResponseBranch? {
         return select {
             (id eq branchId)
         }.mapNotNull {
-            it.mapRowToBranch()
+            it.mapRowToResponseBranch()
         }.singleOrNull()
     }
 
-    override fun selectBranchesByCompanyUID(companyUID: String, lastId: Int, offset: Int): List<Branch> {
+    override fun selectBranchesByCompanyUID(companyUID: String, lastId: Int, size: Int): List<ResponseBranch> {
         val complexJoin = Join(
             this, otherTable = RelationDaoImpl,
             onColumn = id, otherColumn = RelationDaoImpl.branchId,
@@ -53,14 +53,15 @@ object BranchDaoImpl : IntIdTable(), BranchDao {
             },
         )
 
-        return complexJoin.slice(name, city, country).select { (id greater lastId) }.limit(offset)
+        return complexJoin.slice(id, name, city, country).select { (id greater lastId) }.limit(size)
             .orderBy(id to SortOrder.ASC).mapNotNull {
-            it.mapRowToBranch()
+            it.mapRowToResponseBranch()
         }
     }
 
-    private fun ResultRow.mapRowToBranch() =
-        Branch(
+    private fun ResultRow.mapRowToResponseBranch() =
+        ResponseBranch(
+            id = this[id].value,
             name = this[name],
             city = this[city],
             country = this[country]
