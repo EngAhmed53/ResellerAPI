@@ -1,9 +1,5 @@
-package com.reseller.ars.domain.datasource.database
+package com.reseller.ars.data.database
 
-import com.reseller.ars.domain.datasource.database.dao.BranchDaoImpl
-import com.reseller.ars.domain.datasource.database.dao.CompanyDaoImpl
-import org.jetbrains.exposed.sql.SchemaUtils.create
-import com.reseller.ars.domain.datasource.database.dao.RelationDaoImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
@@ -20,9 +16,9 @@ class H2DatabaseProvider : DatabaseProvider, KoinComponent {
     }
 
     override fun init() {
-        Database.connect("jdbc:h2:~/home/reseller;AUTO_SERVER=TRUE", "org.h2.Driver")
+        Database.connect("jdbc:h2:mem:regular;DB_CLOSE_DELAY=-1;", "org.h2.Driver")
         transaction {
-            create(RelationDaoImpl, CompanyDaoImpl, BranchDaoImpl)
+            //create()
         }
     }
 
