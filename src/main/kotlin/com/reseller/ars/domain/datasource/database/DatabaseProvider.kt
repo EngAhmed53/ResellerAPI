@@ -1,4 +1,4 @@
-package com.reseller.ars.data.database
+package com.reseller.ars.domain.datasource.database
 
 interface DatabaseProvider {
     fun init()
