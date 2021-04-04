@@ -11,8 +11,8 @@ class BranchRepositoryImpl : BranchRepository, KoinComponent {
 
     private val branchDao by inject<BranchDao>()
 
-    override fun createBranch(companyUID: String, branch: Branch): Int {
-        return branchDao.insertBranch(companyUID, branch)
+    override fun createBranch(branch: Branch): Int {
+        return branchDao.insertBranch(branch)
     }
 
     override fun getBranchById(branchId: Int): ResponseBranch? {

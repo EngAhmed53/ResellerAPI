@@ -24,7 +24,7 @@ object CompanyDaoImpl : IntIdTable(), CompanyDao {
 
     val createdAt = long("created_at").default(System.currentTimeMillis())
     val updatedAt = long("updated_at").default(System.currentTimeMillis())
-    val uid = varchar("company_id", 200)
+    val uid = varchar("company_id", 200).uniqueIndex()
     val ownerName = varchar("owner_name", 200)
     val ownerId = varchar("owner_id", 200)
     val ownerMail = varchar("owner_email", 200)

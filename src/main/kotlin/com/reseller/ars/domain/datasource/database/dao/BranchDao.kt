@@ -8,7 +8,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
 
 interface BranchDao {
-    fun insertBranch(companyUID: String, branch: Branch): Int
+    fun insertBranch(branch: Branch): Int
 
     fun selectBranchById(branchId: Int): ResponseBranch?
 
@@ -27,7 +27,7 @@ object BranchDaoImpl : IntIdTable(), BranchDao {
     val city = varchar("city", 100)
     val country = varchar("country", 100)
 
-    override fun insertBranch(companyUID: String, branch: Branch): Int {
+    override fun insertBranch(branch: Branch): Int {
         return insert {
             it[name] = branch.name
             it[city] = branch.city

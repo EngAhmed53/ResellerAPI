@@ -5,7 +5,7 @@ import com.reseller.ars.data.model.PutBranch
 import com.reseller.ars.data.model.ResponseBranch
 
 interface BranchRepository {
-    fun createBranch(companyUID: String, branch: Branch): Int
+    fun createBranch(branch: Branch): Int
 
     fun getBranchById(branchId: Int): ResponseBranch?
 

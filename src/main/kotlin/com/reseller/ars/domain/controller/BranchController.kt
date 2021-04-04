@@ -17,7 +17,7 @@ class BranchController : BaseController(), KoinComponent {
 
     suspend fun creatCompanyBranch(companyUID: String, branch: Branch): Result<Int> = dbQuery {
         if (companyRepository.isCompanyEnabled(companyUID)) {
-            val branchId = branchRepository.createBranch(companyUID, branch).also {
+            val branchId = branchRepository.createBranch(branch).also {
                 relationRepository.createRelation(Relation(EntityType.BRANCH, companyUID, it))
             }
             Result.Success(branchId)
