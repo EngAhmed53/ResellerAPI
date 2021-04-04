@@ -90,6 +90,13 @@ object CompanyDaoImpl : IntIdTable(), CompanyDao {
     }
 
     override fun isCompanyEnabled(companyUID: String): Boolean {
-        return getCompanyByUID(companyUID)?.enabled ?: false
+        val isEnabled: Boolean? = slice(enabled)
+            .select {
+                (uid eq companyUID)
+            }.mapNotNull {
+                it[enabled]
+            }.singleOrNull()
+
+        return isEnabled ?: false
     }
 }

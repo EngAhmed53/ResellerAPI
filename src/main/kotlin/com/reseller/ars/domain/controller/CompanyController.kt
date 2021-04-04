@@ -45,5 +45,4 @@ class CompanyController : BaseController(), KoinComponent {
             Result.Error(CompanyException("Error extending company license"))
         }
     }
-
 }
