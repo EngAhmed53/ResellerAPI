@@ -21,7 +21,7 @@ interface BranchDao {
 
 object BranchDaoImpl : IntIdTable(), BranchDao {
 
-    val createdAt = long("created_at").default(System.currentTimeMillis())
+    private val createdAt = long("created_at").default(System.currentTimeMillis())
     val updatedAt = long("updated_at").default(System.currentTimeMillis())
     val name = varchar("name", 200)
     val city = varchar("city", 100)
