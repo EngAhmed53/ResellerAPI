@@ -3,21 +3,16 @@ package com.reseller.ars.domain.datasource.database.dao
 import com.reseller.ars.data.model.Company
 import com.reseller.ars.data.model.License
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.update
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
-interface CompanyDao {
-    fun insertCompany(company: Company): String
+interface CompanyDao: BaseDao<String, Company> {
 
-    fun getCompanyByUID(companyUID: String): Company?
+    fun disable(companyUID: String): Boolean
 
-    fun disableCompany(companyUID: String): Boolean
+    fun updateLicense(companyUID: String, license: License): Boolean
 
-    fun extendCompanyLicense(companyUID: String, license: License): Boolean
-
-    fun isCompanyEnabled(companyUID: String): Boolean
+    fun isEnabled(companyUID: String): Boolean
 }
 
 object CompanyDaoImpl : IntIdTable(), CompanyDao {
@@ -36,27 +31,31 @@ object CompanyDaoImpl : IntIdTable(), CompanyDao {
     val enabled = bool("enabled").default(true)
     val licenseExpire = long("license_expire")
 
-    override fun insertCompany(company: Company): String {
+    override fun insert(obj: Company): String {
         return insert {
-            it[uid] = company.uid
-            it[ownerName] = company.ownerName
-            it[ownerId] = company.ownerId
-            it[ownerPhone] = company.ownerPhone
-            it[ownerMail] = company.ownerMail
-            it[name] = company.name
-            it[email] = company.email
-            it[city] = company.city
-            it[country] = company.country
-            it[licenseExpire] = company.licenseExpire
+            it[uid] = obj.uid
+            it[ownerName] = obj.ownerName
+            it[ownerId] = obj.ownerId
+            it[ownerPhone] = obj.ownerPhone
+            it[ownerMail] = obj.ownerMail
+            it[name] = obj.name
+            it[email] = obj.email
+            it[city] = obj.city
+            it[country] = obj.country
+            it[licenseExpire] = obj.licenseExpire
         }[uid]
     }
 
-    override fun getCompanyByUID(companyUID: String): Company? {
+    override fun selectById(id: String): Company? {
         return select {
-            (uid eq companyUID)
+            (uid eq id)
         }.mapNotNull {
             it.mapRowToCompany()
         }.singleOrNull()
+    }
+
+    override fun delete(id: String): Boolean {
+        return deleteWhere { (uid eq id) } > 0
     }
 
     private fun ResultRow.mapRowToCompany() =
@@ -74,14 +73,14 @@ object CompanyDaoImpl : IntIdTable(), CompanyDao {
             licenseExpire = this[licenseExpire]
         )
 
-    override fun disableCompany(companyUID: String): Boolean {
+    override fun disable(companyUID: String): Boolean {
         return update({ uid eq companyUID }) {
             it[updatedAt] = System.currentTimeMillis()
             it[enabled] = false
         } > 0
     }
 
-    override fun extendCompanyLicense(companyUID: String, license: License): Boolean {
+    override fun updateLicense(companyUID: String, license: License): Boolean {
         return update({ uid eq companyUID }) {
             it[updatedAt] = System.currentTimeMillis()
             it[licenseExpire] = license.licenseExpire
@@ -89,7 +88,7 @@ object CompanyDaoImpl : IntIdTable(), CompanyDao {
         } > 0
     }
 
-    override fun isCompanyEnabled(companyUID: String): Boolean {
+    override fun isEnabled(companyUID: String): Boolean {
         val isEnabled: Boolean? = slice(enabled)
             .select {
                 (uid eq companyUID)

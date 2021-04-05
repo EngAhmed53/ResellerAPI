@@ -3,20 +3,14 @@ package com.reseller.ars.domain.datasource.database.dao
 import com.reseller.ars.data.model.Branch
 import com.reseller.ars.data.model.EntityType
 import com.reseller.ars.data.model.PutBranch
-import com.reseller.ars.data.model.ResponseBranch
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
 
-interface BranchDao {
-    fun insertBranch(branch: Branch): Int
+interface BranchDao: BaseDao<Int, Branch> {
 
-    fun selectBranchById(branchId: Int): ResponseBranch?
+    fun selectByCompanyUID(companyUID: String, lastId: Int, size: Int): List<Branch>
 
-    fun selectBranchesByCompanyUID(companyUID: String, lastId: Int, size: Int): List<ResponseBranch>
-
-    fun updateBranch(branchId: Int, putBranch: PutBranch): Boolean
-
-    fun deleteBranch(branchId: Int): Boolean
+    fun update(branchId: Int, putBranch: PutBranch): Boolean
 }
 
 object BranchDaoImpl : IntIdTable(), BranchDao {
@@ -27,23 +21,23 @@ object BranchDaoImpl : IntIdTable(), BranchDao {
     val city = varchar("city", 100)
     val country = varchar("country", 100)
 
-    override fun insertBranch(branch: Branch): Int {
+    override fun insert(obj: Branch): Int {
         return insert {
-            it[name] = branch.name
-            it[city] = branch.city
-            it[country] = branch.country
+            it[name] = obj.name
+            it[city] = obj.city
+            it[country] = obj.country
         }[id].value
     }
 
-    override fun selectBranchById(branchId: Int): ResponseBranch? {
+    override fun selectById(id: Int): Branch? {
         return select {
-            (id eq branchId)
+            (this@BranchDaoImpl.id eq id)
         }.mapNotNull {
             it.mapRowToResponseBranch()
         }.singleOrNull()
     }
 
-    override fun selectBranchesByCompanyUID(companyUID: String, lastId: Int, size: Int): List<ResponseBranch> {
+    override fun selectByCompanyUID(companyUID: String, lastId: Int, size: Int): List<Branch> {
         val complexJoin = Join(
             this, otherTable = RelationDaoImpl,
             onColumn = id, otherColumn = RelationDaoImpl.branchId,
@@ -60,14 +54,14 @@ object BranchDaoImpl : IntIdTable(), BranchDao {
     }
 
     private fun ResultRow.mapRowToResponseBranch() =
-        ResponseBranch(
+        Branch(
             id = this[id].value,
             name = this[name],
             city = this[city],
             country = this[country]
         )
 
-    override fun updateBranch(branchId: Int, putBranch: PutBranch): Boolean {
+    override fun update(branchId: Int, putBranch: PutBranch): Boolean {
         return update({ id eq branchId }) { branch ->
             branch[updatedAt] = System.currentTimeMillis()
             putBranch.name?.let { branch[name] = it }
@@ -76,7 +70,7 @@ object BranchDaoImpl : IntIdTable(), BranchDao {
         } > 0
     }
 
-    override fun deleteBranch(branchId: Int): Boolean {
-        return deleteWhere { (id eq branchId) } > 0
+    override fun delete(id: Int): Boolean {
+        return deleteWhere { (this@BranchDaoImpl.id eq id) } > 0
     }
 }

@@ -11,10 +11,10 @@ class RelationRepositoryImpl : RelationRepository, KoinComponent {
     private val relationDao by inject<RelationDao>()
 
     override fun createRelation(relation: Relation): Int {
-       return relationDao.createNewRelation(relation)
+       return relationDao.insert(relation)
     }
 
     override fun deleteRelation(companyUId: String, type: EntityType, vararg relationId: Int): Boolean{
-        return relationDao.deleteRelationsTypeByCompanyId(companyUId, type, *relationId)
+        return relationDao.deleteByCompanyId(companyUId, type, *relationId)
     }
 }

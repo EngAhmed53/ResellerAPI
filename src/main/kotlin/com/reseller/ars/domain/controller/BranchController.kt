@@ -3,6 +3,7 @@ package com.reseller.ars.domain.controller
 import com.reseller.ars.app.core.exception.BranchException
 import com.reseller.ars.app.core.exception.CompanyException
 import com.reseller.ars.data.model.*
+import com.reseller.ars.domain.core.mappers.toResponseBranch
 import com.reseller.ars.domain.repository.BranchRepository
 import com.reseller.ars.domain.repository.CompanyRepository
 import com.reseller.ars.domain.repository.RelationRepository
@@ -28,13 +29,13 @@ class BranchController : BaseController(), KoinComponent {
 
     suspend fun getBranchById(branchId: Int): Result<ResponseBranch> = dbQuery {
         branchRepository.getBranchById(branchId)?.let {
-            Result.Success(it)
+            Result.Success(it.toResponseBranch())
         } ?: Result.Error(BranchException("No branch with this id -> id = $branchId"))
     }
 
     suspend fun getCompanyBranches(companyUID: String, lastId: Int, size: Int): Result<List<ResponseBranch>> = dbQuery {
         val branches = branchRepository.getCompanyBranches(companyUID, lastId, size)
-        Result.Success(branches)
+        Result.Success(branches.map { it.toResponseBranch() })
     }
 
     suspend fun updateBranchInfo(companyUID: String, branchId: Int, putBranch: PutBranch) = dbQuery {

@@ -12,22 +12,22 @@ class BranchRepositoryImpl : BranchRepository, KoinComponent {
     private val branchDao by inject<BranchDao>()
 
     override fun createBranch(branch: Branch): Int {
-        return branchDao.insertBranch(branch)
+        return branchDao.insert(branch)
     }
 
-    override fun getBranchById(branchId: Int): ResponseBranch? {
-        return branchDao.selectBranchById(branchId)
+    override fun getBranchById(branchId: Int): Branch? {
+        return branchDao.selectById(branchId)
     }
 
-    override fun getCompanyBranches(companyUID: String, lastId: Int, size: Int): List<ResponseBranch> {
-       return branchDao.selectBranchesByCompanyUID(companyUID, lastId, size)
+    override fun getCompanyBranches(companyUID: String, lastId: Int, size: Int): List<Branch> {
+       return branchDao.selectByCompanyUID(companyUID, lastId, size)
     }
 
     override fun updateBranchInfo(branchId: Int, putBranch: PutBranch): Boolean {
-        return branchDao.updateBranch(branchId, putBranch)
+        return branchDao.update(branchId, putBranch)
     }
 
     override fun deleteBranch(branchId: Int): Boolean {
-        return branchDao.deleteBranch(branchId)
+        return branchDao.delete(branchId)
     }
 }

@@ -20,20 +20,20 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
     val assignedDeviceIMEI = long("imei").uniqueIndex()
     val enabled = bool("enabled").default(true)
 
-    override fun insertSalesman(salesman: Salesman): Int {
+    override fun insert(obj: Salesman): Int {
         return insert {
-            it[uid] = salesman.uid
-            it[firstName] = salesman.firstName
-            it[lastName] = salesman.lastName
-            it[email] = salesman.email
-            it[nationalId] = salesman.nationalId
-            it[assignedSimNumber] = salesman.assignedSimNumber
-            it[assignedDeviceIMEI] = salesman.assignedDeviceIMEI
-            it[enabled] = salesman.enabled
+            it[uid] = obj.uid
+            it[firstName] = obj.firstName
+            it[lastName] = obj.lastName
+            it[email] = obj.email
+            it[nationalId] = obj.nationalId
+            it[assignedSimNumber] = obj.assignedSimNumber
+            it[assignedDeviceIMEI] = obj.assignedDeviceIMEI
+            it[enabled] = obj.enabled
         }[id].value
     }
 
-    override fun selectSalesmenByCompanyUID(companyUID: String, lastId: Int, size: Int): List<ResponseSalesman> {
+    override fun selectByCompanyUID(companyUID: String, lastId: Int, size: Int): List<Salesman> {
         val complexJoin = Join(
             this, otherTable = RelationDaoImpl,
             onColumn = id, otherColumn = RelationDaoImpl.salesmanId,
@@ -55,7 +55,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
             }
     }
 
-    override fun selectSalesmenByBranchId(branchId: Int, lastId: Int, size: Int): List<ResponseSalesman> {
+    override fun selectByBranchId(branchId: Int, lastId: Int, size: Int): List<Salesman> {
         val complexJoin = Join(
             this, otherTable = RelationDaoImpl,
             onColumn = id, otherColumn = RelationDaoImpl.salesmanId,
@@ -77,7 +77,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
             }
     }
 
-    override fun selectSalesmenById(id: Int): ResponseSalesman? {
+    override fun selectById(id: Int): Salesman? {
         return select {
             (this@SalesmanDaoImpl.id eq id)
         }.mapNotNull {
@@ -85,7 +85,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         }.singleOrNull()
     }
 
-    override fun selectSalesmenByEmail(email: String): ResponseSalesman? {
+    override fun selectByEmail(email: String): Salesman? {
         return select {
             (this@SalesmanDaoImpl.email eq email)
         }.mapNotNull {
@@ -93,7 +93,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         }.singleOrNull()
     }
 
-    override fun selectSalesmanByNationalId(nationalId: String): ResponseSalesman? {
+    override fun selectByNationalId(nationalId: String): Salesman? {
         return select {
             (this@SalesmanDaoImpl.nationalId eq nationalId)
         }.mapNotNull {
@@ -101,7 +101,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         }.singleOrNull()
     }
 
-    override fun selectSalesmanBySimNumber(simNumber: String): ResponseSalesman? {
+    override fun selectBySimNumber(simNumber: String): Salesman? {
         return select {
             (assignedSimNumber eq simNumber)
         }.mapNotNull {
@@ -109,7 +109,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         }.singleOrNull()
     }
 
-    override fun selectSalesmanByIMEI(imei: Long): ResponseSalesman? {
+    override fun selectByIMEI(imei: Long): Salesman? {
         return select {
             (assignedDeviceIMEI eq imei)
         }.mapNotNull {
@@ -117,9 +117,10 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         }.singleOrNull()
     }
 
-    private fun ResultRow.toResponseSalesman(): ResponseSalesman =
-        ResponseSalesman(
+    private fun ResultRow.toResponseSalesman(): Salesman =
+        Salesman(
             id = this[id].value,
+            uid = this[uid],
             firstName = this[firstName],
             lastName = this[lastName],
             email = this[email],
@@ -129,7 +130,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
             enabled = this[enabled]
         )
 
-    override fun isSalesmanEnabled(salesmanId: Int): Boolean {
+    override fun isEnabled(salesmanId: Int): Boolean {
         val isEnabled: Boolean? = slice(enabled)
             .select {
                 (id eq salesmanId)
@@ -140,7 +141,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         return isEnabled ?: false
     }
 
-    override fun updateSalesman(salesmanId: Int, putSalesman: PutSalesman): Boolean {
+    override fun update(salesmanId: Int, putSalesman: PutSalesman): Boolean {
         return update({ id eq salesmanId }) { salesman ->
             salesman[updatedAt] = System.currentTimeMillis()
             putSalesman.firstName?.let { salesman[firstName] = it }
@@ -153,8 +154,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         } > 0
     }
 
-    override fun deleteSalesman(salesmanId: Int): Boolean {
-        return deleteWhere { (id eq salesmanId) } > 0
-
+    override fun delete(id: Int): Boolean {
+        return deleteWhere { (this@SalesmanDaoImpl.id eq id) } > 0
     }
 }

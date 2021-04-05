@@ -1,29 +1,28 @@
 package com.reseller.ars.domain.repository
 
 import com.reseller.ars.data.model.PutSalesman
-import com.reseller.ars.data.model.ResponseSalesman
 import com.reseller.ars.data.model.Salesman
 
 interface SalesmanRepository {
-    fun addSalesman(salesman: Salesman): Int
+    fun add(salesman: Salesman): Int
 
-    fun getCompanySalesmen(companyUID: String, lastID: Int, size: Int): List<ResponseSalesman>
+    fun getCompanySalesmen(companyUID: String, lastID: Int, size: Int): List<Salesman>
 
-    fun getBranchSalesmen(branchId: Int, lastID: Int, size: Int): List<ResponseSalesman>
+    fun getBranchSalesmen(branchId: Int, lastID: Int, size: Int): List<Salesman>
 
-    fun getSalesmanById(salesmanId: Int): ResponseSalesman?
+    fun getSalesmanById(salesmanId: Int): Salesman?
 
-    fun getSalesmanByNationalId(nationalId: String): ResponseSalesman?
+    fun getSalesmanByNationalId(nationalId: String): Salesman?
 
-    fun getSalesmanByEmail(email: String): ResponseSalesman?
+    fun getSalesmanByEmail(email: String): Salesman?
 
-    fun getSalesmanBuSimNumber(number: String): ResponseSalesman?
+    fun getSalesmanBySimNumber(number: String): Salesman?
 
-    fun getSalesmanByIMEI(imei: Long): ResponseSalesman?
+    fun getSalesmanByIMEI(imei: Long): Salesman?
 
     fun isSalesmanEnabled(salesmanId: Int): Boolean
 
-    fun editSalesman(salesmanId: Int, putSalesman: PutSalesman): Boolean
+    fun updateSalesman(salesmanId: Int, putSalesman: PutSalesman): Boolean
 
     fun deleteSalesman(salesmanId: Int): Boolean
 }

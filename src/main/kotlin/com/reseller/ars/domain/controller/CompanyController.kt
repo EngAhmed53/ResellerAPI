@@ -2,11 +2,11 @@ package com.reseller.ars.domain.controller
 
 import com.reseller.ars.app.core.exception.CompanyException
 import com.reseller.ars.data.model.*
+import com.reseller.ars.domain.core.mappers.toResponseCompany
 import com.reseller.ars.domain.repository.CompanyRepository
 import com.reseller.ars.domain.repository.RelationRepository
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.lang.Exception
 
 class CompanyController : BaseController(), KoinComponent {
 

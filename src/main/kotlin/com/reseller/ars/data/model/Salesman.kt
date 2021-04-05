@@ -1,13 +1,11 @@
 package com.reseller.ars.data.model
 
-import com.reseller.ars.domain.datasource.database.dao.CompanyDaoImpl
-import com.reseller.ars.domain.datasource.database.dao.CompanyDaoImpl.default
-import com.reseller.ars.domain.datasource.database.dao.CompanyDaoImpl.uniqueIndex
 import kotlinx.serialization.Serializable
 
 
 @Serializable
 data class Salesman(
+    val id: Int? = null,
     val uid: String,
     val firstName: String,
     val lastName: String,
@@ -40,15 +38,4 @@ data class ResponseSalesman(
     val assignedDeviceIMEI: Long,
     val enabled: Boolean
 )
-
-//fun Salesman.toResponseSalesman(): ResponseSalesman =
-//    ResponseSalesman(
-//        firstName = firstName,
-//        lastName = lastName,
-//        email = email,
-//        nationalId = nationalId,
-//        assignedSimNumber = assignedSimNumber,
-//        assignedDeviceIMEI = assignedDeviceIMEI,
-//        enabled = enabled
-//    )
 

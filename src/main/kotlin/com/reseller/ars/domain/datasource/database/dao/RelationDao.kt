@@ -2,19 +2,15 @@ package com.reseller.ars.domain.datasource.database.dao
 
 import com.reseller.ars.data.model.EntityType
 import com.reseller.ars.data.model.Relation
-import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
 import org.koin.core.KoinComponent
 import java.lang.IllegalArgumentException
-import java.util.*
 
 interface RelationDao {
-    fun createNewRelation(relation: Relation): Int
+    fun insert(relation: Relation): Int
 
-    //fun getIdsOfRelationType(type: EntityType): RelationDaoImpl.RelationFilter
-
-    fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean
+    fun deleteByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean
 }
 
 object RelationDaoImpl : IntIdTable(), RelationDao, KoinComponent {
@@ -27,7 +23,7 @@ object RelationDaoImpl : IntIdTable(), RelationDao, KoinComponent {
     val customerId = integer("customer_id").nullable()
     val invoiceId = integer("invoice_id").nullable()
 
-    override fun createNewRelation(relation: Relation): Int {
+    override fun insert(relation: Relation): Int {
         return insert {
             it[entityType] = relation.type
             it[companyId] = relation.companyId
@@ -38,11 +34,7 @@ object RelationDaoImpl : IntIdTable(), RelationDao, KoinComponent {
         }[id].value
     }
 
-//    override fun getIdsOfRelationType(type: EntityType): RelationFilter {
-//        return RelationFilter(type)
-//    }
-
-    override fun deleteRelationsTypeByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean {
+    override fun deleteByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean {
         val idsList = ids.toList()
         return deleteWhere {
             (companyId eq companyUID) and (entityType eq type) and (when (type) {
@@ -54,40 +46,5 @@ object RelationDaoImpl : IntIdTable(), RelationDao, KoinComponent {
             })
         } > 0
     }
-
-//    class RelationFilter(private val requiredType: EntityType) {
-//
-//        fun filterBy(companyUID: String): List<Int> {
-//            return select {
-//                (companyId eq companyUID) and (entityType eq requiredType)
-//            }.mapNotNull {
-//                it.toIdOf(requiredType)
-//            }
-//        }
-//
-//        fun filterBy(companyUID: String, filterType: EntityType, filterTypeId: Int): List<Int> {
-//            return select {
-//                (companyId eq companyUID) and (entityType eq requiredType) and (when (filterType) {
-//                    EntityType.COMPANY -> throw IllegalArgumentException("$filterType is not allowed here")
-//                    EntityType.BRANCH -> branchId eq filterTypeId
-//                    EntityType.SALESMAN -> salesmanId eq filterTypeId
-//                    EntityType.CUSTOMER -> customerId eq filterTypeId
-//                    EntityType.INVOICE -> invoiceId eq filterTypeId
-//                })
-//            }.mapNotNull {
-//                it.toIdOf(requiredType)
-//            }
-//        }
-//
-//        private fun ResultRow.toIdOf(type: EntityType): Int? {
-//            return when (type) {
-//                EntityType.BRANCH -> this[branchId]
-//                EntityType.SALESMAN -> this[salesmanId]
-//                EntityType.CUSTOMER -> this[customerId]
-//                EntityType.INVOICE -> this[invoiceId]
-//                else -> null
-//            }
-//        }
-//    }
 }
 

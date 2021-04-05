@@ -11,22 +11,22 @@ class CompanyRepositoryImpl : CompanyRepository, KoinComponent {
     private val companyDao by inject<CompanyDao>()
 
     override fun createCompany(company: Company): String {
-        return companyDao.insertCompany(company)
+        return companyDao.insert(company)
     }
 
     override fun getCompanyByUID(companyUID: String): Company? {
-        return companyDao.getCompanyByUID(companyUID)
+        return companyDao.selectById(companyUID)
     }
 
     override fun disableCompany(companyUID: String): Boolean {
-        return companyDao.disableCompany(companyUID)
+        return companyDao.disable(companyUID)
     }
 
     override fun extendCompanyLicense(companyUID: String, license: License): Boolean {
-        return companyDao.extendCompanyLicense(companyUID, license)
+        return companyDao.updateLicense(companyUID, license)
     }
 
     override fun isCompanyEnabled(companyUID: String): Boolean {
-        return companyDao.isCompanyEnabled(companyUID)
+        return companyDao.isEnabled(companyUID)
     }
 }

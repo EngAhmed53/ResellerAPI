@@ -29,18 +29,6 @@ data class ResponseCompany(
     val licenseExpire: Long
 )
 
-fun Company.toResponseCompany() = ResponseCompany(
-    this.ownerName,
-    this.ownerMail,
-    this.ownerPhone,
-    this.name,
-    this.email,
-    this.city,
-    this.country,
-    this.enabled,
-    this.licenseExpire
-)
-
 //data class PutCompany(
 //    val ownerName: String?,
 //    val ownerPhone: String?,
