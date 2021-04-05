@@ -8,5 +8,6 @@ object RepositoryInjection {
         single<RelationRepository> { RelationRepositoryImpl() }
         single<CompanyRepository> { CompanyRepositoryImpl() }
         single<BranchRepository> { BranchRepositoryImpl() }
+        single<SalesmanRepository> { SalesmanRepositoryImpl() }
     }
 }
