@@ -33,9 +33,9 @@ class BranchController : BaseController(), KoinComponent {
         } ?: Result.Error(BranchException("No branch with this id -> id = $branchId"))
     }
 
-    suspend fun getCompanyBranches(companyUID: String, lastId: Int, size: Int): Result<List<ResponseBranch>> = dbQuery {
+    suspend fun getCompanyBranches(companyUID: String, lastId: Int, size: Int): List<ResponseBranch> = dbQuery {
         val branches = branchRepository.getCompanyBranches(companyUID, lastId, size)
-        Result.Success(branches.map { it.toResponseBranch() })
+        branches.map { it.toResponseBranch() }
     }
 
     suspend fun updateBranchInfo(companyUID: String, branchId: Int, putBranch: PutBranch) = dbQuery {

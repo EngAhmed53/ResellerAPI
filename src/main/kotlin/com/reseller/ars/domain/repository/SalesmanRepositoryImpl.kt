@@ -2,6 +2,7 @@ package com.reseller.ars.domain.repository
 
 import com.reseller.ars.data.model.PutSalesman
 import com.reseller.ars.data.model.Salesman
+import com.reseller.ars.data.model.SalesmanBranch
 import com.reseller.ars.domain.datasource.database.dao.SalesmanDao
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -14,7 +15,7 @@ class SalesmanRepositoryImpl : SalesmanRepository, KoinComponent {
         return salesmanDao.insert(salesman)
     }
 
-    override fun getCompanySalesmen(companyUID: String, lastID: Int, size: Int): List<Salesman> {
+    override fun getCompanySalesmen(companyUID: String, lastID: Int, size: Int): List<SalesmanBranch> {
         return salesmanDao.selectByCompanyUID(companyUID, lastID, size)
     }
 

@@ -2,11 +2,12 @@ package com.reseller.ars.domain.repository
 
 import com.reseller.ars.data.model.PutSalesman
 import com.reseller.ars.data.model.Salesman
+import com.reseller.ars.data.model.SalesmanBranch
 
 interface SalesmanRepository {
     fun add(salesman: Salesman): Int
 
-    fun getCompanySalesmen(companyUID: String, lastID: Int, size: Int): List<Salesman>
+    fun getCompanySalesmen(companyUID: String, lastID: Int, size: Int): List<SalesmanBranch>
 
     fun getBranchSalesmen(branchId: Int, lastID: Int, size: Int): List<Salesman>
 

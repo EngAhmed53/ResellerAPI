@@ -48,14 +48,10 @@ fun Routing.branchRouting() {
             val lastId = parameters["lastId"]?.toInt() ?: 0
             val size = parameters["size"]?.toInt() ?: 5
 
-            when (val result = branchController.getCompanyBranches(companyUID, lastId = lastId, size = size)) {
-                is Result.Success -> {
-                    call.respond(HttpStatusCode.Created, result.data)
-                }
-                is Result.Error -> {
-                    call.respond(HttpStatusCode.Conflict, result.exception.message ?: "Error")
-                }
-            }
+            val result = branchController.getCompanyBranches(companyUID, lastId = lastId, size = size)
+
+            call.respond(HttpStatusCode.Created, result)
+
         }
 
         put("{uid}/branch/{branchId}") {

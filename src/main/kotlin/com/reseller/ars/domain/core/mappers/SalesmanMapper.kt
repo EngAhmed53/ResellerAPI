@@ -2,6 +2,7 @@ package com.reseller.ars.domain.core.mappers
 
 import com.reseller.ars.data.model.ResponseSalesman
 import com.reseller.ars.data.model.Salesman
+import com.reseller.ars.data.model.SalesmanItem
 
 fun Salesman.toResponseSalesman(): ResponseSalesman =
     ResponseSalesman(
@@ -12,5 +13,13 @@ fun Salesman.toResponseSalesman(): ResponseSalesman =
         nationalId = nationalId,
         assignedSimNumber = assignedSimNumber,
         assignedDeviceIMEI = assignedDeviceIMEI,
+        enabled = enabled
+    )
+
+fun Salesman.toSalesmanItem(): SalesmanItem =
+    SalesmanItem(
+        id = id ?: -1,
+        firstName = firstName,
+        lastName = lastName,
         enabled = enabled
     )

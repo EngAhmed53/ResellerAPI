@@ -4,9 +4,8 @@ import com.reseller.ars.data.model.Company
 import com.reseller.ars.data.model.License
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
-interface CompanyDao: BaseDao<String, Company> {
+interface CompanyDao : BaseDao<String, Company> {
 
     fun disable(companyUID: String): Boolean
 

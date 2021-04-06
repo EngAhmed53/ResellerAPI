@@ -1,9 +1,6 @@
 package com.reseller.ars.domain.datasource.database.dao
 
-import com.reseller.ars.data.model.EntityType
-import com.reseller.ars.data.model.PutSalesman
-import com.reseller.ars.data.model.ResponseSalesman
-import com.reseller.ars.data.model.Salesman
+import com.reseller.ars.data.model.*
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
 
@@ -33,8 +30,9 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         }[id].value
     }
 
-    override fun selectByCompanyUID(companyUID: String, lastId: Int, size: Int): List<Salesman> {
-        val complexJoin = Join(
+    override fun selectByCompanyUID(companyUID: String, lastId: Int, size: Int): List<SalesmanBranch> {
+
+        val relationSalesmenJoin = Join(
             this, otherTable = RelationDaoImpl,
             onColumn = id, otherColumn = RelationDaoImpl.salesmanId,
             additionalConstraint = {
@@ -43,15 +41,22 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
             },
         )
 
-        return complexJoin
+        val branchSalesmanRelationJoin = relationSalesmenJoin.join(
+            otherTable = BranchDaoImpl,
+            joinType = JoinType.INNER,
+            onColumn = RelationDaoImpl.branchId,
+            otherColumn = BranchDaoImpl.id
+        )
+
+        return branchSalesmanRelationJoin
             .slice(
                 id,
-                firstName, lastName, email, nationalId,
-                assignedSimNumber, assignedDeviceIMEI,
-                enabled
+                firstName, lastName,
+                enabled,
+                BranchDaoImpl.name
             ).select { (id greater lastId) }.limit(size)
             .orderBy(id to SortOrder.ASC).mapNotNull {
-                it.toResponseSalesman()
+                it.toSalesmanBranch()
             }
     }
 
@@ -73,7 +78,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
                 enabled
             ).select { (id greater lastId) }.limit(size)
             .orderBy(id to SortOrder.ASC).mapNotNull {
-                it.toResponseSalesman()
+                it.toSalesman()
             }
     }
 
@@ -81,7 +86,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         return select {
             (this@SalesmanDaoImpl.id eq id)
         }.mapNotNull {
-            it.toResponseSalesman()
+            it.toSalesman()
         }.singleOrNull()
     }
 
@@ -89,7 +94,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         return select {
             (this@SalesmanDaoImpl.email eq email)
         }.mapNotNull {
-            it.toResponseSalesman()
+            it.toSalesman()
         }.singleOrNull()
     }
 
@@ -97,7 +102,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         return select {
             (this@SalesmanDaoImpl.nationalId eq nationalId)
         }.mapNotNull {
-            it.toResponseSalesman()
+            it.toSalesman()
         }.singleOrNull()
     }
 
@@ -105,7 +110,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         return select {
             (assignedSimNumber eq simNumber)
         }.mapNotNull {
-            it.toResponseSalesman()
+            it.toSalesman()
         }.singleOrNull()
     }
 
@@ -113,11 +118,11 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         return select {
             (assignedDeviceIMEI eq imei)
         }.mapNotNull {
-            it.toResponseSalesman()
+            it.toSalesman()
         }.singleOrNull()
     }
 
-    private fun ResultRow.toResponseSalesman(): Salesman =
+    private fun ResultRow.toSalesman(): Salesman =
         Salesman(
             id = this[id].value,
             uid = this[uid],
@@ -128,6 +133,15 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
             assignedSimNumber = this[assignedSimNumber],
             assignedDeviceIMEI = this[assignedDeviceIMEI],
             enabled = this[enabled]
+        )
+
+    private fun ResultRow.toSalesmanBranch(): SalesmanBranch =
+        SalesmanBranch(
+            id = this[id].value,
+            firstName = this[firstName],
+            lastName = this[lastName],
+            enabled = this[enabled],
+            branchName = this[BranchDaoImpl.name]
         )
 
     override fun isEnabled(salesmanId: Int): Boolean {

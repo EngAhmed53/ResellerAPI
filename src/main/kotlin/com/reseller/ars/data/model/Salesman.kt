@@ -39,3 +39,10 @@ data class ResponseSalesman(
     val enabled: Boolean
 )
 
+@Serializable
+data class SalesmanItem(
+    val id: Int,
+    val firstName: String,
+    val lastName: String,
+    val enabled: Boolean
+)
