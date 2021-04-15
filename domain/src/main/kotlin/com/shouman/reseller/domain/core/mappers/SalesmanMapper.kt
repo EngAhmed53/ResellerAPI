@@ -4,7 +4,7 @@ import com.shouman.reseller.domain.entities.ResponseSalesman
 import com.shouman.reseller.domain.entities.Salesman
 import com.shouman.reseller.domain.entities.SalesmanItem
 
-fun Salesman.toResponseSalesman(): ResponseSalesman =
+internal fun Salesman.toResponseSalesman(): ResponseSalesman =
     ResponseSalesman(
         id = id ?: -1,
         firstName = firstName,
@@ -16,7 +16,7 @@ fun Salesman.toResponseSalesman(): ResponseSalesman =
         enabled = enabled
     )
 
-fun Salesman.toSalesmanItem(): SalesmanItem =
+internal fun Salesman.toSalesmanItem(): SalesmanItem =
     SalesmanItem(
         id = id ?: -1,
         firstName = firstName,
