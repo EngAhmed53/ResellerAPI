@@ -5,11 +5,9 @@ import com.shouman.reseller.core.exception.SalesmanException
 import com.shouman.reseller.domain.core.extensions.isNull
 import com.shouman.reseller.domain.core.mappers.toResponseSalesman
 import com.shouman.reseller.domain.core.mappers.toSalesmanItem
-
 import com.shouman.reseller.domain.entities.*
 import com.shouman.reseller.domain.useCases.*
 import org.koin.core.KoinComponent
-
 
 class SalesmanController(
     private val isCompanyEnabledUseCase: (String) -> Boolean = { IsCompanyEnabledUseCase(it).invoke() },
