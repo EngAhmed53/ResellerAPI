@@ -2,7 +2,7 @@ package com.shouman.reseller.data.repositoriesImpl
 
 
 import com.shouman.reseller.data.datasource.database.dao.SalesmanDao
-import com.shouman.reseller.domain.repository.SalesmanRepository
+import com.shouman.reseller.domain.repositories.SalesmanRepository
 import com.shouman.reseller.domain.entities.PutSalesman
 import com.shouman.reseller.domain.entities.Salesman
 import com.shouman.reseller.domain.entities.SalesmanBranch

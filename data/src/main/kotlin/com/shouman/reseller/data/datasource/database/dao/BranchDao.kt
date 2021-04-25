@@ -13,7 +13,7 @@ interface BranchDao: BaseDao<Int, Branch> {
     fun update(branchId: Int, putBranch: PutBranch): Boolean
 }
 
-object BranchDaoImpl : IntIdTable(), BranchDao {
+object BranchDaoImpl : IntIdTable("branches"), BranchDao {
 
     val createdAt = long("created_at").default(System.currentTimeMillis())
     val updatedAt = long("updated_at").default(System.currentTimeMillis())

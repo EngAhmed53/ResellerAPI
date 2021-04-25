@@ -21,7 +21,7 @@ class H2DatabaseProvider : DatabaseProvider, KoinComponent {
     }
 
     override fun init() {
-        Database.connect("jdbc:h2:~/home/reseller;AUTO_SERVER=TRUE", "org.h2.Driver")
+        Database.connect("jdbc:h2:~/database/reseller;AUTO_SERVER=TRUE", "org.h2.Driver")
         transaction {
             create(RelationDaoImpl, CompanyDaoImpl, BranchDaoImpl)
         }

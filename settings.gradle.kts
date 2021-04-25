@@ -1,5 +1,5 @@
 rootProject.name = "ResellerAPI"
-include("app")
+include("api")
 include("data")
 include("domain")
 

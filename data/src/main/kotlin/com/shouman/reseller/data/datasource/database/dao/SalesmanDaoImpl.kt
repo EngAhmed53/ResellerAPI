@@ -75,7 +75,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
 
         return complexJoin
             .slice(
-                id,
+                id, uid,
                 firstName, lastName, email, nationalId,
                 assignedSimNumber, assignedDeviceIMEI,
                 enabled

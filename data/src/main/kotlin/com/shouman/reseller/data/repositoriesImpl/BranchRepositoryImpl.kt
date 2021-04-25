@@ -1,7 +1,7 @@
 package com.shouman.reseller.data.repositoriesImpl
 
 import com.shouman.reseller.data.datasource.database.dao.BranchDao
-import com.shouman.reseller.domain.repository.BranchRepository
+import com.shouman.reseller.domain.repositories.BranchRepository
 import com.shouman.reseller.domain.entities.Branch
 import com.shouman.reseller.domain.entities.PutBranch
 import org.koin.core.KoinComponent

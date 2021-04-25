@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 data class Company(
     val uid: String,
     val ownerName: String,
-    val ownerId: String,
     val ownerMail: String,
     val ownerPhone: String,
     val name: String,
@@ -28,14 +27,4 @@ data class ResponseCompany(
     val enabled: Boolean,
     val licenseExpire: Long
 )
-
-//data class PutCompany(
-//    val ownerName: String?,
-//    val ownerPhone: String?,
-//    val name: String?,
-//    val email: String?,
-//    val city: String?,
-//    val country: String?,
-//)
-
 

@@ -1,7 +1,7 @@
 package com.shouman.reseller.data.repositoriesImpl
 
 import com.shouman.reseller.data.datasource.database.dao.CompanyDao
-import com.shouman.reseller.domain.repository.CompanyRepository
+import com.shouman.reseller.domain.repositories.CompanyRepository
 import com.shouman.reseller.domain.entities.Company
 import com.shouman.reseller.domain.entities.License
 import org.koin.core.KoinComponent

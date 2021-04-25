@@ -14,34 +14,31 @@ interface CompanyDao : BaseDao<String, Company> {
     fun isEnabled(companyUID: String): Boolean
 }
 
-object CompanyDaoImpl : IntIdTable(), CompanyDao {
+object CompanyDaoImpl : IntIdTable("companies"), CompanyDao {
 
     val createdAt = long("created_at").default(System.currentTimeMillis())
     val updatedAt = long("updated_at").default(System.currentTimeMillis())
     val uid = varchar("company_id", 200).uniqueIndex()
     val ownerName = varchar("owner_name", 200)
-    val ownerId = varchar("owner_id", 200)
     val ownerMail = varchar("owner_email", 200)
     val ownerPhone = varchar("owner_phone", 50)
     val name = varchar("name", 200)
     val email = varchar("email", 200).nullable()
     val city = varchar("city", 100)
     val country = varchar("country", 100)
-    val enabled = bool("enabled").default(true)
-    val licenseExpire = long("license_expire")
+    val enabled = bool("enabled").default(false)
+    val licenseExpire = long("license_expire").default(1619289280246)
 
     override fun insert(obj: Company): String {
         return insert {
             it[uid] = obj.uid
             it[ownerName] = obj.ownerName
-            it[ownerId] = obj.ownerId
             it[ownerPhone] = obj.ownerPhone
             it[ownerMail] = obj.ownerMail
             it[name] = obj.name
             it[email] = obj.email
             it[city] = obj.city
             it[country] = obj.country
-            it[licenseExpire] = obj.licenseExpire
         }[uid]
     }
 
@@ -61,7 +58,6 @@ object CompanyDaoImpl : IntIdTable(), CompanyDao {
         Company(
             uid = this[uid],
             ownerName = this[ownerName],
-            ownerId = this[ownerId],
             ownerMail = this[ownerMail],
             ownerPhone = this[ownerPhone],
             name = this[name],
