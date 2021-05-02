@@ -12,8 +12,6 @@ interface SalesmanDao: BaseDao<Int, Salesman> {
 
     fun selectByEmail(email: String): Salesman?
 
-    fun selectByNationalId(nationalId: String): Salesman?
-
     fun selectBySimNumber(simNumber: String): Salesman?
 
     fun selectByIMEI(imei: Long): Salesman?

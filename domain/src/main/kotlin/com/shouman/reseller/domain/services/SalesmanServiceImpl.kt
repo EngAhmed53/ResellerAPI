@@ -4,7 +4,7 @@ import com.shouman.reseller.domain.entities.*
 import com.shouman.reseller.domain.repositories.RelationRepository
 import com.shouman.reseller.domain.repositories.SalesmanRepository
 
-class SalesmanServiceImpl(
+internal class SalesmanServiceImpl(
     private val relationRepository: RelationRepository,
     private val salesmanRepository: SalesmanRepository
 ) : SalesmanService {

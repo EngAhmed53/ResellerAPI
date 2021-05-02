@@ -7,7 +7,7 @@ import com.shouman.reseller.domain.entities.Relation
 import com.shouman.reseller.domain.repositories.BranchRepository
 import com.shouman.reseller.domain.repositories.RelationRepository
 
-class BranchUseServiceImpl(
+internal class BranchUseServiceImpl(
     private val relationRepository: RelationRepository,
     private val branchRepository: BranchRepository
 ) : BranchUseService {

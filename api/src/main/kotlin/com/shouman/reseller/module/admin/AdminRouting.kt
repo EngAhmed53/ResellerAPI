@@ -18,7 +18,7 @@ import org.koin.ktor.ext.inject
  */
 fun Route.adminCompanyRouting(companyController: CompanyController) {
 
-    route("api/admin/company") {
+    route("api/admin/companies") {
 
         put("{uid}/disable") {
             val uid = call.parameters["uid"] ?: return@put call.respond(

@@ -1,8 +1,16 @@
 package com.shouman.reseller.domain.core.mappers
 
+import com.shouman.reseller.domain.entities.PostSalesman
 import com.shouman.reseller.domain.entities.ResponseSalesman
 import com.shouman.reseller.domain.entities.Salesman
 import com.shouman.reseller.domain.entities.SalesmanItem
+
+fun PostSalesman.toSalesman(firebaseUID: String) =
+    Salesman(
+        id = null,
+        uid = firebaseUID,
+        firstName,lastName, email, assignedSimNumber, assignedDeviceIMEI, enabled
+    )
 
 fun Salesman.toResponseSalesman(): ResponseSalesman =
     ResponseSalesman(
@@ -10,7 +18,6 @@ fun Salesman.toResponseSalesman(): ResponseSalesman =
         firstName = firstName,
         lastName = lastName,
         email = email,
-        nationalId = nationalId,
         assignedSimNumber = assignedSimNumber,
         assignedDeviceIMEI = assignedDeviceIMEI,
         enabled = enabled

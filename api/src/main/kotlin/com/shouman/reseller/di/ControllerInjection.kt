@@ -9,6 +9,6 @@ object ControllerInjection {
     val koinBean = module {
         single { CompanyController(get()) }
         single { BranchController(get(), get()) }
-        single { SalesmanController(get(), get(), get()) }
+        single { SalesmanController(get(), get(), get(), get(), get()) }
     }
 }

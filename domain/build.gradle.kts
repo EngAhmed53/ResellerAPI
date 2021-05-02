@@ -12,5 +12,6 @@ dependencies {
     // Koin for Kotlin
     api("org.koin:koin-ktor:$koinVersion")
     api("io.ktor:ktor-serialization:$ktorVersion")
+
 }
 

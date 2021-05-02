@@ -2,6 +2,7 @@ package com.shouman.reseller.controller
 
 import com.shouman.reseller.domain.core.extensions.isNull
 import com.shouman.reseller.domain.core.mappers.toResponseSalesman
+import com.shouman.reseller.domain.core.mappers.toSalesman
 import com.shouman.reseller.domain.core.mappers.toSalesmanItem
 import com.shouman.reseller.domain.entities.*
 import com.shouman.reseller.domain.entities.ResponseCode.*
@@ -12,32 +13,30 @@ class SalesmanController(
     private val companyService: CompanyService,
     private val salesmanService: SalesmanService,
     private val branchUseService: BranchUseService,
+    private val handheldService: HandheldService,
+    private val firebaseService: FirebaseService
 ) : BaseController(), KoinComponent {
 
     private val isEmailUsed: (String) -> Boolean = { salesmanService.getSalesmanByEmail(it) != null }
     private val isSimNumberUsed: (String) -> Boolean = { salesmanService.getSalesmanBySimNumber(it) != null }
-    private val isNationalIdUsed: (String) -> Boolean = { salesmanService.getSalesmanByNationalId(it) != null }
     private val isIMEIUsed: (Long) -> Boolean = { salesmanService.getSalesmanByIMEI(it) != null }
 
-    suspend fun addSalesman(companyUID: String, branchId: Int, salesman: Salesman): Result<Int> =
+    suspend fun addSalesman(companyUID: String, branchId: Int, postSalesman: PostSalesman): Result<Int> =
         dbQuery {
-
             when {
-                companyService.isCompanyEnabled(companyUID).not() -> Result.Error(ApiException(COMPANY_DISABLE))
-
+                companyService.isCompanyEnabled(companyUID).not() -> Result.Error(ApiException(COMPANY_DISABLED))
                 branchUseService.getBranchById(branchId).isNull() -> Result.Error(ApiException(BRANCH_NOT_FOUND))
-
-                isEmailUsed(salesman.email) -> Result.Error(ApiException(EMAIL_ALREADY_TAKEN))
-
-                isNationalIdUsed(salesman.nationalId) -> Result.Error(ApiException(NATIONAL_ID_ALREADY_TAKEN))
-
-                isIMEIUsed(salesman.assignedDeviceIMEI) -> Result.Error(ApiException(IMEI_ALREADY_ASSIGNED))
-
-                isSimNumberUsed(salesman.assignedSimNumber) -> Result.Error(ApiException(SIM_NUMBER_ALREADY_ASSIGNED))
-
                 else -> {
-                    val id = salesmanService.createSalesman(companyUID, branchId, salesman)
-                    Result.Success(id)
+                    try {
+                        val credential = firebaseService.getSalesmanCredential(postSalesman)
+
+                        val salesman = postSalesman.toSalesman(credential.uid)
+
+                        val id = salesmanService.createSalesman(companyUID, branchId, salesman)
+                        Result.Success(id)
+                    } catch (e: Exception) {
+                        Result.Error(ApiException(SALESMAN_CREATE_ERROR))
+                    }
                 }
             }
         }
@@ -60,42 +59,30 @@ class SalesmanController(
         } ?: Result.Error(ApiException(SALESMAN_NOT_FOUND))
     }
 
-//    suspend fun getSalesmanByNationalId(nationalId: String): Result<ResponseSalesman> = dbQuery {
-//        salesmanRepository.getSalesmanByNationalId(nationalId)?.let {
-//            Result.Success(it.toResponseSalesman())
-//        } ?: Result.Error(SalesmanException("No salesman with this national id -> id = $nationalId"))
-//    }
-//
-//    suspend fun getSalesmanByNEmail(nationalId: String): Result<ResponseSalesman> = dbQuery {
-//        salesmanRepository.getSalesmanByNationalId(nationalId)?.let {
-//            Result.Success(it.toResponseSalesman())
-//        } ?: Result.Error(SalesmanException("No salesman with this national id -> id = $nationalId"))
-//    }
-//
-//    suspend fun getSalesmanBySimNumber(number: String): Result<ResponseSalesman> = dbQuery {
-//        salesmanRepository.getSalesmanBySimNumber(number)?.let {
-//            Result.Success(it.toResponseSalesman())
-//        } ?: Result.Error(SalesmanException("No salesman assigned to this sim number -> number = $number"))
-//    }
-//
-//    suspend fun getSalesmanByIMEI(imei: Long): Result<ResponseSalesman> = dbQuery {
-//        salesmanRepository.getSalesmanByIMEI(imei)?.let {
-//            Result.Success(it.toResponseSalesman())
-//        } ?: Result.Error(SalesmanException("No salesman assigned to this IMEI -> imei = $imei"))
-//    }
+
+    suspend fun isEmailExist(email: String): Result<Boolean> = dbQuery {
+        Result.Success(isEmailUsed.invoke(email))
+    }
+
+    suspend fun isSimNumberExist(number: String): Result<Boolean> = dbQuery {
+        Result.Success(isSimNumberUsed.invoke(number))
+    }
+
+    suspend fun isIMEIAccepted(imei: Long): Result<Boolean> = dbQuery {
+        when (isIMEIUsed.invoke(imei)) {
+            true -> Result.Success(false) // IMEI is already used, so it is not accepted
+            false -> {
+                Result.Success(handheldService.isHandheldModelAccepted(imei))
+            }
+        }
+    }
 
     suspend fun updateSalesman(companyUID: String, salesmanId: Int, putSalesman: PutSalesman): Result<Boolean> =
         dbQuery {
             when {
-                companyService.isCompanyEnabled(companyUID).not() -> Result.Error(ApiException(COMPANY_DISABLE))
+                companyService.isCompanyEnabled(companyUID).not() -> Result.Error(ApiException(COMPANY_DISABLED))
 
                 putSalesman.email?.let { isEmailUsed(it) } == true -> Result.Error(ApiException(EMAIL_ALREADY_TAKEN))
-
-                putSalesman.nationalId?.let { isNationalIdUsed(it) } == true -> Result.Error(
-                    ApiException(
-                        NATIONAL_ID_ALREADY_TAKEN
-                    )
-                )
 
                 putSalesman.assignedDeviceIMEI?.let { isIMEIUsed(it) } == true -> Result.Error(
                     ApiException(

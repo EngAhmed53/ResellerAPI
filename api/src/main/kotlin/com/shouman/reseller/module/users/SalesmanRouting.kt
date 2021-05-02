@@ -36,10 +36,10 @@ fun Route.adminSalesmanRouting(salesmanController: SalesmanController) {
     }
 }
 
-@Location("api/users/company/{uid}")
+@Location("api/users/companies/{uid}")
 class Salesmen(val uid: String) {
 
-    @Location("branch/{branchId}/salesman")
+    @Location("branches/{branchId}/salesmen")
      data class PostSalesman(
         val parent: Salesmen,
         val branchId: Int,

@@ -15,7 +15,6 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
     val firstName = varchar("first_name", 200)
     val lastName = varchar("last_name", 200)
     val email = varchar("email", 200).uniqueIndex()
-    val nationalId = varchar("national_id", 50).uniqueIndex()
     val assignedSimNumber = varchar("sim_number", 50).uniqueIndex()
     val assignedDeviceIMEI = long("imei").uniqueIndex()
     val enabled = bool("enabled").default(true)
@@ -26,7 +25,6 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
             it[firstName] = obj.firstName
             it[lastName] = obj.lastName
             it[email] = obj.email
-            it[nationalId] = obj.nationalId
             it[assignedSimNumber] = obj.assignedSimNumber
             it[assignedDeviceIMEI] = obj.assignedDeviceIMEI
             it[enabled] = obj.enabled
@@ -76,7 +74,7 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
         return complexJoin
             .slice(
                 id, uid,
-                firstName, lastName, email, nationalId,
+                firstName, lastName, email,
                 assignedSimNumber, assignedDeviceIMEI,
                 enabled
             ).select { (id greater lastId) }.limit(size)
@@ -96,14 +94,6 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
     override fun selectByEmail(email: String): Salesman? {
         return select {
             (SalesmanDaoImpl.email eq email)
-        }.mapNotNull {
-            it.toSalesman()
-        }.singleOrNull()
-    }
-
-    override fun selectByNationalId(nationalId: String): Salesman? {
-        return select {
-            (SalesmanDaoImpl.nationalId eq nationalId)
         }.mapNotNull {
             it.toSalesman()
         }.singleOrNull()
@@ -132,7 +122,6 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
             firstName = this[firstName],
             lastName = this[lastName],
             email = this[email],
-            nationalId = this[nationalId],
             assignedSimNumber = this[assignedSimNumber],
             assignedDeviceIMEI = this[assignedDeviceIMEI],
             enabled = this[enabled]
@@ -164,7 +153,6 @@ object SalesmanDaoImpl : IntIdTable("salesmen"), SalesmanDao {
             putSalesman.firstName?.let { salesman[firstName] = it }
             putSalesman.lastName?.let { salesman[lastName] = it }
             putSalesman.email?.let { salesman[email] = it }
-            putSalesman.nationalId?.let { salesman[nationalId] = it }
             putSalesman.assignedSimNumber?.let { salesman[assignedSimNumber] = it }
             putSalesman.assignedDeviceIMEI?.let { salesman[assignedDeviceIMEI] = it }
             putSalesman.enabled?.let { salesman[enabled] = it }

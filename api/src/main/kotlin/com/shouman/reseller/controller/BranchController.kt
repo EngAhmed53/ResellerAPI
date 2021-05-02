@@ -36,7 +36,7 @@ class BranchController(
                 else -> Result.Error(ApiException(BRANCH_UPDATE_ERROR))
             }
         } else {
-            Result.Error(ApiException(COMPANY_DISABLE))
+            Result.Error(ApiException(COMPANY_DISABLED))
         }
     }
 

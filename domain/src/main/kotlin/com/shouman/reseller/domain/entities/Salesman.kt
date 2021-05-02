@@ -2,7 +2,6 @@ package com.shouman.reseller.domain.entities
 
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 data class Salesman(
     val id: Int? = null,
@@ -10,7 +9,17 @@ data class Salesman(
     val firstName: String,
     val lastName: String,
     val email: String,
-    val nationalId: String,
+    val assignedSimNumber: String,
+    val assignedDeviceIMEI: Long,
+    val enabled: Boolean
+)
+
+
+@Serializable
+data class PostSalesman(
+    val firstName: String,
+    val lastName: String,
+    val email: String,
     val assignedSimNumber: String,
     val assignedDeviceIMEI: Long,
     val enabled: Boolean
@@ -21,7 +30,6 @@ data class PutSalesman(
     val firstName: String? = null,
     val lastName: String? = null,
     val email: String? = null,
-    val nationalId: String? = null,
     val assignedSimNumber: String? = null,
     val assignedDeviceIMEI: Long? = null,
     val enabled: Boolean? = null
@@ -33,7 +41,6 @@ data class ResponseSalesman(
     val firstName: String,
     val lastName: String,
     val email: String,
-    val nationalId: String,
     val assignedSimNumber: String,
     val assignedDeviceIMEI: Long,
     val enabled: Boolean

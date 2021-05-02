@@ -7,7 +7,7 @@ import com.shouman.reseller.domain.entities.Relation
 import com.shouman.reseller.domain.repositories.CompanyRepository
 import com.shouman.reseller.domain.repositories.RelationRepository
 
-class CompanyServiceImpl(
+internal class CompanyServiceImpl(
     private val relationRepository: RelationRepository,
     private val companyRepository: CompanyRepository
 ) : CompanyService {

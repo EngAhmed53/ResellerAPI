@@ -18,7 +18,7 @@ import io.ktor.request.*
 
 fun Route.companyRouting(companyController: CompanyController) {
 
-    route("api/users/company") {
+    route("api/users/companies") {
 
         post {
             val company = call.receive<Company>()
