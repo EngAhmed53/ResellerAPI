@@ -11,7 +11,6 @@ interface SalesmanService {
 
     fun getSalesmanById(id: Int): Salesman?
     fun getSalesmanByEmail(email: String): Salesman?
-    fun getSalesmanByNationalId(nationalId: String): Salesman?
     fun getSalesmanBySimNumber(simNumber: String): Salesman?
     fun getSalesmanByIMEI(imei: Long): Salesman?
 

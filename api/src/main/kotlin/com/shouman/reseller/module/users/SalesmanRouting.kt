@@ -2,6 +2,7 @@ package com.shouman.reseller.module.users
 
 import com.shouman.reseller.controller.SalesmanController
 import com.shouman.reseller.domain.core.mappers.toResponse
+import com.shouman.reseller.domain.entities.PostSalesman
 import com.shouman.reseller.domain.entities.Salesman
 import com.shouman.reseller.domain.entities.ServerResponse
 import io.ktor.application.*
@@ -14,7 +15,7 @@ fun Route.adminSalesmanRouting(salesmanController: SalesmanController) {
 
     post<Salesmen.PostSalesman> { postSalesman ->
 
-        val salesman = call.receive<Salesman>()
+        val salesman = call.receive<PostSalesman>()
 
         val result = salesmanController.addSalesman(postSalesman.parent.uid, postSalesman.branchId, salesman)
 

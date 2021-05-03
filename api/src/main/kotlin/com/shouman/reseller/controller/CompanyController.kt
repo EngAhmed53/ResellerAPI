@@ -28,7 +28,7 @@ class CompanyController(
         if (companyService.disableCompany(uid)) {
             Result.Success(true)
         } else {
-            Result.Error(ApiException(COMPANY_DISABLE))
+            Result.Error(ApiException(COMPANY_DISABLED))
         }
     }
 

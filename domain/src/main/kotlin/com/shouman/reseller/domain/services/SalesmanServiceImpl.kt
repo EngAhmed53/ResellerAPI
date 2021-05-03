@@ -30,10 +30,6 @@ internal class SalesmanServiceImpl(
         return salesmanRepository.getSalesmanByEmail(email)
     }
 
-    override fun getSalesmanByNationalId(nationalId: String): Salesman? {
-        return salesmanRepository.getSalesmanByNationalId(nationalId)
-    }
-
     override fun getSalesmanBySimNumber(simNumber: String): Salesman? {
         return salesmanRepository.getSalesmanBySimNumber(simNumber)
     }

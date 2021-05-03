@@ -13,8 +13,6 @@ interface SalesmanRepository {
 
     fun getSalesmanById(salesmanId: Int): Salesman?
 
-    fun getSalesmanByNationalId(nationalId: String): Salesman?
-
     fun getSalesmanByEmail(email: String): Salesman?
 
     fun getSalesmanBySimNumber(number: String): Salesman?

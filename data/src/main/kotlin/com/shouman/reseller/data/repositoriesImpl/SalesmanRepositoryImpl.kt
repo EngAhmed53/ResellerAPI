@@ -29,10 +29,6 @@ class SalesmanRepositoryImpl : SalesmanRepository, KoinComponent {
         return salesmanDao.selectById(salesmanId)
     }
 
-    override fun getSalesmanByNationalId(nationalId: String): Salesman? {
-        return salesmanDao.selectByNationalId(nationalId)
-    }
-
     override fun getSalesmanByEmail(email: String): Salesman? {
         return salesmanDao.selectByEmail(email)
     }
