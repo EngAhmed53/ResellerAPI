@@ -17,15 +17,11 @@ import io.ktor.locations.*
 @OptIn(KtorExperimentalLocationsAPI::class)
 fun Routing.branchRouting(branchController: BranchController) {
 
-    post("/api/users/companies/{uid}/branches") {
-
-        val uid = call.parameters["uid"] ?: return@post call.respond(
-            status = HttpStatusCode.BadRequest, message = "Missing or malformed uid"
-        )
+    post<Branches.Post> { params ->
 
         val branch = call.receive<Branch>()
 
-        val result = branchController.creatCompanyBranch(uid, branch)
+        val result = branchController.creatCompanyBranch(params.parent.uid, branch)
 
         call.respond(result.toResponse())
     }
@@ -59,19 +55,23 @@ fun Routing.branchRouting(branchController: BranchController) {
     }
 }
 
-
 @OptIn(KtorExperimentalLocationsAPI::class)
-@Location("/api/users/companies/{uid}")
+@Location("/api/users/branches")
 class Branches(val uid: String) {
 
-    @Location("/branches")
+    @Location("/listing")
     data class Listing(
         val parent: Branches,
         val lastId: Int,
         val size: Int
     )
 
-    @Location("/branches/{branchId}")
+    @Location("/")
+    data class Post(
+        val parent: Branches,
+    )
+
+    @Location("/{branchId}")
     data class Edit(
         val parent: Branches,
         val branchId: Int

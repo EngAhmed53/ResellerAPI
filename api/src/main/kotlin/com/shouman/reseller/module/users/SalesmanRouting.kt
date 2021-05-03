@@ -59,23 +59,23 @@ fun Route.salesmanRouting(salesmanController: SalesmanController) {
     put {  }
 }
 
-@Location("api/users/companies/{uid}")
+@Location("api/users/salesmen")
 class SalesmenLocations(val uid: String) {
 
-    @Location("branches/{branchId}/salesmen")
+    @Location("/")
     data class PostSalesman(
         val parent: SalesmenLocations,
         val branchId: Int,
     )
 
-    @Location("salesmen")
+    @Location("/companyListing")
     data class CompanyListing(
         val parent: SalesmenLocations,
         val lastId: Int,
         val size: Int
     )
 
-    @Location("branches/{branchId}/salesmen")
+    @Location("/branchListing")
     data class BranchListing(
         val parent: SalesmenLocations,
         val branchId: Int,
