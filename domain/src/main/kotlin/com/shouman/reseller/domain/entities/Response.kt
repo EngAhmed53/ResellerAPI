@@ -1,4 +1,5 @@
 package com.shouman.reseller.domain.entities
+
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -15,6 +16,7 @@ enum class ResponseCode {
     SIM_NUMBER_ALREADY_ASSIGNED,
     IMEI_ALREADY_ASSIGNED,
     DEVICE_NOT_SUPPORTED,
+    F_AUTH_ERROR,
     SALESMAN_CREATE_ERROR,
     SALESMAN_NOT_FOUND,
     SALESMAN_UPDATE_ERROR,
@@ -23,5 +25,9 @@ enum class ResponseCode {
 }
 
 @Serializable
-data class ServerResponse<T>(val responseCode: ResponseCode = ResponseCode.SUCCESS, val body: T? = null)
+data class ServerResponse<T>(
+    val responseCode: ResponseCode = ResponseCode.SUCCESS,
+    val msg: String? = null,
+    val body: T? = null
+)
 

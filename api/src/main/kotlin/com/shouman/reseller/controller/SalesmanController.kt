@@ -1,5 +1,6 @@
 package com.shouman.reseller.controller
 
+import com.google.firebase.FirebaseException
 import com.shouman.reseller.domain.core.extensions.isNull
 import com.shouman.reseller.domain.core.mappers.toResponseSalesman
 import com.shouman.reseller.domain.core.mappers.toSalesman
@@ -8,7 +9,6 @@ import com.shouman.reseller.domain.entities.*
 import com.shouman.reseller.domain.entities.ResponseCode.*
 import com.shouman.reseller.domain.services.*
 import org.koin.core.KoinComponent
-import javax.annotation.meta.When
 
 class SalesmanController(
     private val companyService: CompanyService,
@@ -36,9 +36,12 @@ class SalesmanController(
                         val id = salesmanService.createSalesman(companyUID, branchId, salesman)
                         Result.Success(id)
                     } catch (e: Exception) {
-                        println(e.message)
                         uid?.let { firebaseAuthService.deleteSalesmanFirebaseAccount(it) }
-                        Result.Error(ApiException(SALESMAN_CREATE_ERROR))
+
+                        when(e) {
+                            is FirebaseException -> Result.Error(ApiException(F_AUTH_ERROR, e.message))
+                            else -> Result.Error(ApiException(SALESMAN_CREATE_ERROR))
+                        }
                     }
                 }
             }
