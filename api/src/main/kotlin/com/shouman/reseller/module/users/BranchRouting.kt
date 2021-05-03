@@ -17,7 +17,7 @@ import io.ktor.locations.*
 @OptIn(KtorExperimentalLocationsAPI::class)
 fun Routing.branchRouting(branchController: BranchController) {
 
-    post("/api/users/companines/{uid}/branches") {
+    post("/api/users/companies/{uid}/branches") {
 
         val uid = call.parameters["uid"] ?: return@post call.respond(
             status = HttpStatusCode.BadRequest, message = "Missing or malformed uid"

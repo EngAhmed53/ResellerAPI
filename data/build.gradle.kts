@@ -2,9 +2,6 @@ val exposedVersion: String by project
 val h2Version: String by project
 val ktorVersion: String by project
 
-plugins {
-}
-
 group = "com.shouman.reseller"
 version = "0.0.1"
 

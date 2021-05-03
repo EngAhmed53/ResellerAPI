@@ -10,7 +10,7 @@ object RepositoryInjection {
         single<CompanyRepository> { CompanyRepositoryImpl() }
         single<BranchRepository> { BranchRepositoryImpl() }
         single<SalesmanRepository> { SalesmanRepositoryImpl() }
-        single<FirebaseRepository> { FirebaseRepositoryImpl(get()) }
+        single<FirebaseAuthRepository> { FirebaseAuthRepositoryImpl(get()) }
         single<HandheldRepository> { HandheldRepositoryImpl(get()) }
     }
 }

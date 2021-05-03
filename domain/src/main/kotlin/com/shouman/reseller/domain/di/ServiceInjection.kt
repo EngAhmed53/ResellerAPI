@@ -9,6 +9,6 @@ object ServiceInjection {
         single<BranchUseService> { BranchUseServiceImpl(get(), get()) }
         single<SalesmanService> { SalesmanServiceImpl(get(), get()) }
         single<HandheldService> { HandheldServiceImpl(get()) }
-        single<FirebaseService> { FirebaseServiceImpl(get()) }
+        single<FirebaseAuthService> { FirebaseAuthServiceImpl(get()) }
     }
 }
