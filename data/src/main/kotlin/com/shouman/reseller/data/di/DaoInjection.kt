@@ -10,5 +10,6 @@ object DaoInjection {
         single<CompanyDao> { CompanyDaoImpl }
         single<BranchDao> { BranchDaoImpl }
         single<SalesmanDao> { SalesmanDaoImpl }
+        single<CustomerDao> { CustomerDaoImpl }
     }
 }

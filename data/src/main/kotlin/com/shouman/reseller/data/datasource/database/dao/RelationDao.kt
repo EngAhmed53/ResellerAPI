@@ -9,7 +9,7 @@ import org.koin.core.KoinComponent
 interface RelationDao {
     fun insert(relation: Relation): Int
 
-    fun selectByType(companyUID: String, type: EntityType, id: Int): Relation?
+    fun isRelationExist(relation: Relation): Boolean
 
     fun deleteByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean
 }
@@ -21,7 +21,7 @@ object RelationDaoImpl : IntIdTable("relations"), RelationDao, KoinComponent {
     val companyId = reference("company_id", CompanyDaoImpl.uid)
     val branchId = integer(name = "branch_id").references(BranchDaoImpl.id).nullable()
     val salesmanId = integer("salesman_id").references(SalesmanDaoImpl.id).nullable()
-    val customerId = integer("customer_id").nullable()
+    val customerId = integer("customer_id").references(CustomerDaoImpl.id).nullable()
     val invoiceId = integer("invoice_id").nullable()
 
     override fun insert(relation: Relation): Int {
@@ -35,29 +35,26 @@ object RelationDaoImpl : IntIdTable("relations"), RelationDao, KoinComponent {
         }[id].value
     }
 
-    override fun selectByType(companyUID: String, type: EntityType, id: Int): Relation? {
+    override fun isRelationExist(relation: Relation): Boolean {
         return select {
-            (companyId eq companyUID) and (entityType eq type) and (when (type) {
-                EntityType.COMPANY -> throw IllegalArgumentException("$type is not allowed here")
-                EntityType.BRANCH -> branchId eq id
-                EntityType.SALESMAN -> salesmanId eq id
-                EntityType.CUSTOMER -> customerId eq id
-                EntityType.INVOICE -> invoiceId eq id
-            })
-        }.mapNotNull {
-            it.mapRowToResponseBranch()
-        }.singleOrNull()
+            (companyId eq relation.companyId) and
+                    (entityType eq relation.type) and
+                    (branchId eq relation.branchId) and
+                    (salesmanId eq relation.salesmanId) and
+                    (customerId eq relation.customerId) and
+                    (invoiceId eq relation.invoiceId)
+        }.mapNotNull { it }.isNotEmpty()
     }
 
-    private fun ResultRow.mapRowToResponseBranch() =
-        Relation(
-            type = this[entityType],
-            companyId = this[companyId],
-            branchId = this[branchId],
-            salesmanId = this[salesmanId],
-            customerId = this[customerId],
-            invoiceId = this[invoiceId]
-        )
+//    private fun ResultRow.mapRowToResponseBranch() =
+//        Relation(
+//            type = this[entityType],
+//            companyId = this[companyId],
+//            branchId = this[branchId],
+//            salesmanId = this[salesmanId],
+//            customerId = this[customerId],
+//            invoiceId = this[invoiceId]
+//        )
 
     override fun deleteByCompanyId(companyUID: String, type: EntityType, vararg ids: Int): Boolean {
         val idsList = ids.toList()

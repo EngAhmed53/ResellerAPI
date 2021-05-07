@@ -5,10 +5,12 @@ import org.koin.dsl.module
 
 object ServiceInjection {
     val koinBean = module {
+        single<RelationService> { RelationServiceImpl(get()) }
         single<CompanyService> { CompanyServiceImpl(get(), get()) }
-        single<BranchUseService> { BranchUseServiceImpl(get(), get()) }
+        single<BranchService> { BranchServiceImpl(get(), get()) }
         single<SalesmanService> { SalesmanServiceImpl(get(), get()) }
         single<HandheldService> { HandheldServiceImpl(get()) }
         single<FirebaseAuthService> { FirebaseAuthServiceImpl(get()) }
+        single<CustomerService> { CustomerServiceImpl(get(), get()) }
     }
 }

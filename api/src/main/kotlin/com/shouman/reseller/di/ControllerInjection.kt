@@ -2,6 +2,7 @@ package com.shouman.reseller.di
 
 import com.shouman.reseller.controller.BranchController
 import com.shouman.reseller.controller.CompanyController
+import com.shouman.reseller.controller.CustomerController
 import com.shouman.reseller.controller.SalesmanController
 import org.koin.dsl.module
 
@@ -10,5 +11,6 @@ object ControllerInjection {
         single { CompanyController(get()) }
         single { BranchController(get(), get()) }
         single { SalesmanController(get(), get(), get(), get(), get()) }
+        single { CustomerController(get(), get(), get()) }
     }
 }

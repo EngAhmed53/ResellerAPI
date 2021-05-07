@@ -1,35 +1,16 @@
-package com.shouman.reseller.data.datasource
+package com.shouman.reseller.data.datasource.firebase
 
-
-import com.google.auth.oauth2.GoogleCredentials
-import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.UserRecord
 import com.shouman.reseller.domain.entities.PostSalesman
-import com.shouman.reseller.domain.entities.Salesman
 import com.shouman.reseller.domain.entities.SalesmanCredential
 import org.apache.commons.lang3.RandomStringUtils
-import java.io.FileInputStream
 import kotlin.jvm.Throws
 
 class FirebaseAuthDataSource {
 
-    private val firebaseApp by lazy {
-        val serviceAccount = FileInputStream(
-            "/home/ahmedshouman/IdeaProjects/ResellerAPI/reseller-firebase-adminsdk.json"
-        )
-
-        val options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .build()
-
-        FirebaseApp.initializeApp(options)
-    }
-
-    private val firebaseAuth by lazy { FirebaseAuth.getInstance(firebaseApp) }
-
+    private val firebaseAuth by lazy { FirebaseAuth.getInstance(FirebaseAppProvider.provideFirebaseApp()) }
 
     @Throws(FirebaseAuthException::class)
     fun createSalesmanFirebaseAccount(salesman: PostSalesman): SalesmanCredential {

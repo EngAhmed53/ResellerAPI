@@ -15,8 +15,8 @@ class RelationRepositoryImpl : RelationRepository, KoinComponent {
        return relationDao.insert(relation)
     }
 
-    override fun getRelation(companyUId: String, type: EntityType, id: Int): Relation? {
-        return relationDao.selectByType(companyUId, type, id)
+    override fun isValidRelation(relation: Relation): Boolean {
+        return relationDao.isRelationExist(relation)
     }
 
     override fun deleteRelation(companyUId: String, type: EntityType, vararg relationId: Int): Boolean{

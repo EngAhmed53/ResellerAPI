@@ -13,7 +13,7 @@ import org.koin.core.KoinComponent
 class SalesmanController(
     private val companyService: CompanyService,
     private val salesmanService: SalesmanService,
-    private val branchUseService: BranchUseService,
+    private val branchService: BranchService,
     private val handheldService: HandheldService,
     private val firebaseAuthService: FirebaseAuthService
 ) : BaseController(), KoinComponent {
@@ -26,7 +26,7 @@ class SalesmanController(
         dbQuery {
             when {
                 companyService.isCompanyEnabled(companyUID).not() -> Result.Error(ApiException(COMPANY_DISABLED))
-                branchUseService.getBranchById(branchId).isNull() -> Result.Error(ApiException(BRANCH_NOT_FOUND))
+                branchService.getBranchById(branchId).isNull() -> Result.Error(ApiException(BRANCH_NOT_FOUND))
                 else -> {
                     var uid: String? = null
                     try {
@@ -37,7 +37,6 @@ class SalesmanController(
                         Result.Success(id)
                     } catch (e: Exception) {
                         uid?.let { firebaseAuthService.deleteSalesmanFirebaseAccount(it) }
-
                         when(e) {
                             is FirebaseException -> Result.Error(ApiException(F_AUTH_ERROR, e.message))
                             else -> Result.Error(ApiException(SALESMAN_CREATE_ERROR))

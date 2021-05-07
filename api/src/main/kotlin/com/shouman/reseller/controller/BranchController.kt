@@ -6,12 +6,12 @@ import com.shouman.reseller.domain.services.*
 
 class BranchController(
     private val companyService: CompanyService,
-    private val branchUseService: BranchUseService
+    private val branchService: BranchService
 ) : BaseController() {
 
     suspend fun creatCompanyBranch(companyUID: String, branch: Branch): Result<Int> = dbQuery {
         if (companyService.isCompanyEnabled(companyUID)) {
-            val branchId = branchUseService.createBranch(companyUID, branch)
+            val branchId = branchService.createBranch(companyUID, branch)
             Result.Success(branchId)
         } else {
             Result.Error(ApiException(COMPANY_DISABLED))
@@ -19,19 +19,19 @@ class BranchController(
     }
 
     suspend fun getBranchById(branchId: Int): Result<ResponseBranch> = dbQuery {
-        branchUseService.getBranchById(branchId)?.let {
+        branchService.getBranchById(branchId)?.let {
             Result.Success(it.toResponseBranch())
         } ?: Result.Error(ApiException(BRANCH_NOT_FOUND))
     }
 
     suspend fun getCompanyBranches(companyUID: String, lastId: Int, size: Int): List<ResponseBranch> = dbQuery {
-        val branches = branchUseService.getCompanyBranches(companyUID, lastId, size)
+        val branches = branchService.getCompanyBranches(companyUID, lastId, size)
         branches.map { it.toResponseBranch() }
     }
 
     suspend fun updateBranchInfo(companyUID: String, branchId: Int, putBranch: PutBranch) = dbQuery {
         if (companyService.isCompanyEnabled(companyUID)) {
-            when (branchUseService.updateBranch(companyUID, branchId, putBranch)) {
+            when (branchService.updateBranch(companyUID, branchId, putBranch)) {
                 true -> Result.Success(true)
                 else -> Result.Error(ApiException(BRANCH_UPDATE_ERROR))
             }
@@ -41,7 +41,7 @@ class BranchController(
     }
 
     suspend fun deleteCompanyBranchById(companyUID: String, branchId: Int): Result<Boolean> = dbQuery {
-        if (branchUseService.deleteBranch(companyUID, branchId)) {
+        if (branchService.deleteBranch(companyUID, branchId)) {
             Result.Success(true)
         } else {
             Result.Error(

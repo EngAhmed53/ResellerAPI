@@ -7,7 +7,7 @@ import com.shouman.reseller.domain.repositories.RelationRepository
 import org.koin.core.inject
 
 
-interface BranchUseService {
+interface BranchService {
     fun createBranch(companyUID: String, branch: Branch): Int
 
     fun getBranchById(id: Int): Branch?

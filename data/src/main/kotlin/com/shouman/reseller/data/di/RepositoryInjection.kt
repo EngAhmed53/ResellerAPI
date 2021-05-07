@@ -12,5 +12,7 @@ object RepositoryInjection {
         single<SalesmanRepository> { SalesmanRepositoryImpl() }
         single<FirebaseAuthRepository> { FirebaseAuthRepositoryImpl(get()) }
         single<HandheldRepository> { HandheldRepositoryImpl(get()) }
+        single<CustomerRepository> { CustomerRepositoryImpl(get()) }
+        single<FirebaseDbRepository> { FirebaseDbRepositoryImpl(get()) }
     }
 }

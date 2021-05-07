@@ -7,10 +7,10 @@ import com.shouman.reseller.domain.entities.Relation
 import com.shouman.reseller.domain.repositories.BranchRepository
 import com.shouman.reseller.domain.repositories.RelationRepository
 
-internal class BranchUseServiceImpl(
+internal class BranchServiceImpl(
     private val relationRepository: RelationRepository,
     private val branchRepository: BranchRepository
-) : BranchUseService {
+) : BranchService {
 
     override fun createBranch(companyUID: String, branch: Branch): Int {
         return branchRepository.createBranch(branch).also {
@@ -27,11 +27,7 @@ internal class BranchUseServiceImpl(
     }
 
     override fun updateBranch(companyUID: String, branchId: Int, putBranch: PutBranch): Boolean {
-        return if (relationRepository.getRelation(companyUID, EntityType.BRANCH, branchId) != null) {
-            branchRepository.updateBranchInfo(branchId, putBranch)
-        } else {
-            false
-        }
+        return branchRepository.updateBranchInfo(branchId, putBranch)
     }
 
     override fun deleteBranch(companyUID: String, branchId: Int): Boolean {

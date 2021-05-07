@@ -1,6 +1,6 @@
 package com.shouman.reseller.data.repositoriesImpl
 
-import com.shouman.reseller.data.datasource.FirebaseAuthDataSource
+import com.shouman.reseller.data.datasource.firebase.FirebaseAuthDataSource
 import com.shouman.reseller.domain.entities.PostSalesman
 import com.shouman.reseller.domain.entities.SalesmanCredential
 import com.shouman.reseller.domain.repositories.FirebaseAuthRepository
