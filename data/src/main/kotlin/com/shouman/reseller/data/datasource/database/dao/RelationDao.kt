@@ -39,10 +39,10 @@ object RelationDaoImpl : IntIdTable("relations"), RelationDao, KoinComponent {
         return select {
             (companyId eq relation.companyId) and
                     (entityType eq relation.type) and
-                    (branchId eq relation.branchId) and
-                    (salesmanId eq relation.salesmanId) and
-                    (customerId eq relation.customerId) and
-                    (invoiceId eq relation.invoiceId)
+                    (relation.branchId?.let { branchId eq it } ?: Op.TRUE) and
+                    (relation.salesmanId?.let { salesmanId eq it } ?: Op.TRUE) and
+                    (relation.customerId?.let { customerId eq it } ?: Op.TRUE) and
+                    (relation.invoiceId?.let { invoiceId eq it } ?: Op.TRUE)
         }.mapNotNull { it }.isNotEmpty()
     }
 

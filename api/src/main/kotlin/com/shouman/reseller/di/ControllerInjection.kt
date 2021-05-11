@@ -9,8 +9,8 @@ import org.koin.dsl.module
 object ControllerInjection {
     val koinBean = module {
         single { CompanyController(get()) }
-        single { BranchController(get(), get()) }
-        single { SalesmanController(get(), get(), get(), get(), get()) }
-        single { CustomerController(get(), get(), get()) }
+        single { BranchController(get()) }
+        single { SalesmanController(get(), get()) }
+        single { CustomerController(get()) }
     }
 }

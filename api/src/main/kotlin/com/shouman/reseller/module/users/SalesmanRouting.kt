@@ -10,55 +10,73 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
+@OptIn(KtorExperimentalLocationsAPI::class)
 fun Route.salesmanRouting(salesmanController: SalesmanController) {
 
-    post<SalesmenLocations.PostSalesman> { postSalesman ->
+    post<SalesmenLocations.PostSalesman> { params ->
 
         val salesman = call.receive<PostSalesman>()
 
-        val result = salesmanController.addSalesman(postSalesman.parent.uid, postSalesman.branchId, salesman)
 
-        call.respond(result.toResponse())
+        val result = with(params) {
+            salesmanController.addSalesman(parent.uid, branchId, salesman)
+        }
+
+        call.respond(status = result.first, message = result.second)
     }
 
     get<SalesmenLocations.CompanyListing> { params ->
 
-        val result = salesmanController.getCompanySalesmen(params.parent.uid, params.lastId, params.size)
 
-        call.respond(ServerResponse(body = result))
+
+        val result = with(params) {
+            salesmanController.getCompanySalesmen(parent.uid, lastId, size)
+        }
+
+
+        call.respond(status = result.first, message = result.second)
     }
 
     get<SalesmenLocations.BranchListing> { params ->
 
-        val result = salesmanController.getBranchSalesmen(params.branchId, params.lastId, params.size)
+        val result = with(params) {
+            salesmanController.getBranchSalesmen(parent.uid, branchId, lastId, size)
+        }
 
-        call.respond(ServerResponse(body = result))
+        call.respond(status = result.first, message = result.second)
     }
 
     get<EmailCheck> { params ->
 
-        val result = salesmanController.isEmailExist(email = params.email)
+        val result = with(params) {
+            salesmanController.isEmailExist(email = email)
+        }
 
-        call.respond(result.toResponse())
+        call.respond(status = result.first, message = result.second)
     }
 
     get<SimNumberCheck> { params ->
 
-        val result = salesmanController.isSimNumberExist(number = params.number)
+        val result = with(params) {
+            salesmanController.isSimNumberExist(number = number)
+        }
 
-        call.respond(result.toResponse())
+        call.respond(status = result.first, message = result.second)
     }
 
     get<DeviceCheck> { params ->
 
-        val result = salesmanController.isIMEIAccepted(imei = params.imei)
+        val result = with(params) {
+            salesmanController.isIMEIAccepted(imei = imei)
+        }
 
-        call.respond(result.toResponse())
+        call.respond(status = result.first, message = result.second)
     }
 
     put {  }
 }
 
+@OptIn(KtorExperimentalLocationsAPI::class)
 @Location("api/users/salesmen")
 class SalesmenLocations(val uid: String) {
 

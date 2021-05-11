@@ -1,125 +1,78 @@
 package com.shouman.reseller.controller
 
-import com.shouman.reseller.domain.core.extensions.isNull
+import com.shouman.reseller.Response
 import com.shouman.reseller.domain.entities.*
-import com.shouman.reseller.domain.services.CompanyService
 import com.shouman.reseller.domain.services.CustomerService
-import com.shouman.reseller.domain.services.RelationService
+import com.shouman.reseller.domain.entities.StatusCode.*
+import io.ktor.http.*
 
 class CustomerController(
-    private val relationService: RelationService,
-    private val companyService: CompanyService,
-    private val customerService: CustomerService,
+    private val customerService: CustomerService
 ) : BaseController() {
-
-    private val isEmailExist: (companyUID: String, email: String) -> Boolean = { uid, email ->
-        customerService.getCustomerByEmail(companyUID = uid, email = email) != null
-    }
-    private val isPhoneNumberExist: (companyUID: String, number: String) -> Boolean = { uid, number ->
-        customerService.getCustomerByPhoneNumber(companyUID = uid, number = number) != null
-    }
-
     suspend fun addCustomer(
         companyUID: String,
         branchId: Int,
         salesmanId: Int,
         newCustomer: PostCustomer
-    ): Result<Int> = dbQuery {
-        when {
-
-            relationService.isValidRelation(Relation(EntityType.SALESMAN, companyUID, branchId, salesmanId))
-                .not() -> Result.Error(
-                ApiException(
-                    ResponseCode.INVALID_RELATION
-                )
-            )
-
-            companyService.isCompanyEnabled(companyUID)
-                .not() -> Result.Error(ApiException(ResponseCode.COMPANY_DISABLED))
-
-            else -> {
-                handleNewCustomer(newCustomer, companyUID, salesmanId, branchId)
+    ): Response<Int> = dbQuery {
+        val result = customerService.createCustomer(newCustomer, companyUID, branchId, salesmanId)
+        return@dbQuery when (result.first) {
+            INVALID_RELATION -> {
+                HttpStatusCode.NotFound to ServerResponse(statusCode = ERROR)
             }
+            COMPANY_DISABLED -> HttpStatusCode.Locked to ServerResponse(statusCode = COMPANY_DISABLED)
+
+            CUSTOMER_ALREADY_FOUND -> HttpStatusCode.Conflict to ServerResponse(statusCode = CUSTOMER_ALREADY_FOUND)
+
+            SUCCESS -> {
+                HttpStatusCode.Created to ServerResponse(body = result.second)
+            }
+            else -> throw Exception("Illegal status code ${result.first}")
         }
     }
 
-    private fun handleNewCustomer(
-        postCustomer: PostCustomer,
-        companyUID: String,
-        salesmanId: Int,
-        branchId: Int
-    ): Result<Int> {
-        val customerInfo = postCustomer.customerInfo
-        when {
-            isEmailExist.invoke(companyUID, customerInfo.email) ||
-                    isPhoneNumberExist.invoke(
-                        companyUID,
-                        customerInfo.phoneNumber
-                    ) -> {
-                return Result.Error(ApiException(ResponseCode.CUSTOMER_ALREADY_FOUND))
-            }
-            else -> {
-                val id = customerService.createCustomer(customerInfo, companyUID, branchId, salesmanId)
-                // save the location
-
-                // save the visit
-
-                // notify other clients
-
-                // return the saved id
-                return Result.Success(id)
-            }
-        }
-    }
-
-    suspend fun getCustomerById(companyUID: String, customerId: Int): Result<Customer> = dbQuery {
+    suspend fun getCustomerById(companyUID: String, customerId: Int): Response<Customer> = dbQuery {
         customerService.getCustomerById(companyUID, customerId)?.let {
-            Result.Success(it)
-        } ?: Result.Error(ApiException(ResponseCode.SALESMAN_NOT_FOUND))
+            HttpStatusCode.OK to ServerResponse(body = it)
+        } ?: HttpStatusCode.NotFound to ServerResponse(statusCode = NOT_FOUND)
     }
 
-    suspend fun getCompanyCustomers(companyUID: String, lastId: Int, size: Int): List<CompanyCustomer> = dbQuery {
-        customerService.getCompanyCustomers(companyUID, lastId, size)
-    }
-
-    suspend fun getBranchCustomers(companyUID: String, branchId: Int, lastId: Int, size: Int): List<BranchCustomer> =
+    suspend fun getCompanyCustomers(companyUID: String, lastId: Int, size: Int): Response<List<CompanyCustomer>> =
         dbQuery {
-            val isValidRelation = relationService.isValidRelation(
-                Relation(
-                    type = EntityType.BRANCH,
-                    companyUID,
-                    branchId = branchId
-                )
-            )
+            val result = customerService.getCompanyCustomers(companyUID, lastId, size)
+            return@dbQuery when (result.first) {
+                INVALID_RELATION -> HttpStatusCode.NotFound to ServerResponse(statusCode = ERROR)
+                SUCCESS -> HttpStatusCode.OK to ServerResponse(body = result.second)
+                else -> throw Exception("Illegal status code ${result.first}")
+            }
+        }
 
-            return@dbQuery if (isValidRelation.not()) {
-                emptyList()
-            } else {
-                customerService.getBranchCustomers(branchId, lastId, size)
+    suspend fun getBranchCustomers(
+        companyUID: String,
+        branchId: Int,
+        lastId: Int,
+        size: Int
+    ): Response<List<BranchCustomer>> =
+        dbQuery {
+            val result = customerService.getBranchCustomers(companyUID, branchId, lastId, size)
+            return@dbQuery when (result.first) {
+                INVALID_RELATION -> HttpStatusCode.NotFound to ServerResponse(statusCode = ERROR)
+                SUCCESS -> HttpStatusCode.OK to ServerResponse(body = result.second)
+                else -> throw Exception("Illegal status code ${result.first}")
             }
         }
 
     suspend fun getSalesmanCustomers(
         companyUID: String,
-        branchId: Int,
         salesmanId: Int,
         lastId: Int,
         size: Int
-    ): List<SalesmanCustomer> = dbQuery {
-
-        val isValidRelation = relationService.isValidRelation(
-            Relation(
-                type = EntityType.SALESMAN,
-                companyId = companyUID,
-                branchId = branchId,
-                salesmanId = salesmanId
-            )
-        )
-
-        return@dbQuery if (isValidRelation.not()) {
-            emptyList()
-        } else {
-            customerService.getSalesmanCustomers(salesmanId, lastId, size)
+    ): Response<List<SalesmanCustomer>> = dbQuery {
+        val result = customerService.getSalesmanCustomers(companyUID, salesmanId, lastId, size)
+        return@dbQuery when (result.first) {
+            INVALID_RELATION -> HttpStatusCode.NotFound to ServerResponse(statusCode = ERROR)
+            SUCCESS -> HttpStatusCode.OK to ServerResponse(body = result.second)
+            else -> throw Exception("Illegal status code ${result.first}")
         }
     }
 }

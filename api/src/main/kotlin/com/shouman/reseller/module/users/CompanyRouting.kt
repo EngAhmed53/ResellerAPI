@@ -22,16 +22,20 @@ fun Route.companyRouting(companyController: CompanyController) {
 
         post {
             val company = call.receive<Company>()
-            call.respond(companyController.createCompany(company).toResponse())
+
+            val result = companyController.createCompany(company)
+
+            call.respond(result)
         }
 
         get("{uid}") {
             val uid = call.parameters["uid"] ?: return@get call.respond(
                 status = HttpStatusCode.BadRequest, message = "Missing or malformed uid"
             )
+
             val result = companyController.getCompanyInfo(uid)
 
-            call.respond(result.toResponse())
+            call.respond(status = result.first, message = result.second!!)
         }
     }
 }

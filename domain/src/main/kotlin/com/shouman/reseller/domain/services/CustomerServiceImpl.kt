@@ -5,20 +5,73 @@ import com.shouman.reseller.domain.repositories.CustomerRepository
 import com.shouman.reseller.domain.repositories.RelationRepository
 
 class CustomerServiceImpl(
-    private val customerRepository: CustomerRepository,
-    private val relationRepository: RelationRepository
+    private val relationService: RelationService,
+    private val companyService: CompanyService,
+    private val customerRepository: CustomerRepository
 ) : CustomerService {
-    override fun createCustomer(customer: Customer, companyUID: String, branchId: Int, salesmanId: Int): Int {
-        return customerRepository.createCustomer(companyUID, customer).also {
-            relationRepository.createRelation(
-                Relation(
-                    type = EntityType.CUSTOMER,
-                    companyId = companyUID,
-                    branchId = branchId,
-                    salesmanId = salesmanId,
-                    customerId = it
-                )
-            )
+
+    private val isEmailExist: (companyUID: String, email: String) -> Boolean = { uid, email ->
+        getCustomerByEmail(companyUID = uid, email = email) != null
+    }
+    private val isPhoneNumberExist: (companyUID: String, number: String) -> Boolean = { uid, number ->
+        getCustomerByPhoneNumber(companyUID = uid, number = number) != null
+    }
+
+    override fun createCustomer(
+        newCustomer: PostCustomer,
+        companyUID: String,
+        branchId: Int,
+        salesmanId: Int
+    ): Pair<StatusCode, Int> {
+        return when {
+            relationService.isValidRelation(Relation(EntityType.SALESMAN, companyUID, branchId, salesmanId))
+                .not() -> StatusCode.INVALID_RELATION to -1
+
+            companyService.isCompanyEnabled(companyUID)
+                .not() -> StatusCode.COMPANY_DISABLED to -1
+
+            else -> {
+                handleNewCustomer(newCustomer, companyUID, salesmanId, branchId)
+            }
+        }
+    }
+
+    private fun handleNewCustomer(
+        postCustomer: PostCustomer,
+        companyUID: String,
+        salesmanId: Int,
+        branchId: Int
+    ): Pair<StatusCode, Int> {
+        val customerInfo = postCustomer.customerInfo
+        when {
+            isEmailExist.invoke(companyUID, customerInfo.email) ||
+                    isPhoneNumberExist.invoke(
+                        companyUID,
+                        customerInfo.phoneNumber
+                    ) -> {
+                return StatusCode.CUSTOMER_ALREADY_FOUND to -1
+            }
+            else -> {
+                val id = customerRepository.createCustomer(companyUID, customerInfo).also {
+                    relationService.addRelation(
+                        Relation(
+                            type = EntityType.CUSTOMER,
+                            companyId = companyUID,
+                            branchId = branchId,
+                            salesmanId = salesmanId,
+                            customerId = it
+                        )
+                    )
+                }
+                // save the location
+
+                // save the visit
+
+                // notify other clients
+
+                // return the saved id
+                return StatusCode.SUCCESS to id
+            }
         }
     }
 
@@ -34,25 +87,70 @@ class CustomerServiceImpl(
         return customerRepository.getCustomerByPhoneNumber(companyUID, number)
     }
 
-    override fun getCompanyCustomers(uid: String, lastId: Int, size: Int): List<CompanyCustomer> {
-        return customerRepository.getCompanyCustomers(uid, lastId, size)
+    override fun getCompanyCustomers(uid: String, lastId: Int, size: Int): Pair<StatusCode, List<CompanyCustomer>> {
+
+        val isValidRelation = relationService.isValidRelation(
+            Relation(
+                type = EntityType.COMPANY,
+                uid,
+            )
+        )
+
+        return if (isValidRelation) {
+            StatusCode.SUCCESS to customerRepository.getCompanyCustomers(uid, lastId, size)
+        } else {
+            StatusCode.INVALID_RELATION to emptyList()
+        }
     }
 
-    override fun getBranchCustomers(branchId: Int, lastId: Int, size: Int): List<BranchCustomer> {
-        return customerRepository.getBranchCustomers(branchId, lastId, size)
+    override fun getBranchCustomers(
+        companyUID: String,
+        branchId: Int,
+        lastId: Int,
+        size: Int
+    ): Pair<StatusCode, List<BranchCustomer>> {
+        val isValidRelation = relationService.isValidRelation(
+            Relation(
+                type = EntityType.BRANCH,
+                companyUID,
+                branchId = branchId
+            )
+        )
+
+        return if (isValidRelation) {
+            StatusCode.SUCCESS to customerRepository.getBranchCustomers(branchId, lastId, size)
+        } else {
+            StatusCode.INVALID_RELATION to emptyList()
+        }
     }
 
-    override fun getSalesmanCustomers(salesmanId: Int, lastId: Int, size: Int): List<SalesmanCustomer> {
-        return customerRepository.getSalesmanCustomers(salesmanId, lastId, size)
+    override fun getSalesmanCustomers(
+        companyUID: String,
+        salesmanId: Int,
+        lastId: Int,
+        size: Int
+    ): Pair<StatusCode, List<SalesmanCustomer>> {
+
+        val isValidRelation = relationService.isValidRelation(
+            Relation(
+                type = EntityType.SALESMAN,
+                companyUID,
+                salesmanId = salesmanId
+            )
+        )
+
+        return if (isValidRelation) {
+            StatusCode.SUCCESS to customerRepository.getSalesmanCustomers(salesmanId, lastId, size)
+        } else {
+            StatusCode.INVALID_RELATION to emptyList()
+        }
     }
 
     override fun updateCustomerInfo(companyUID: String, customerId: Int, putCustomer: PutCustomer): Boolean {
-        return customerRepository.updateCustomerInfo(companyUID, customerId, putCustomer)
+        TODO("Not yet implemented")
     }
 
     override fun deleteCustomer(companyUID: String, customerId: Int): Boolean {
-        return relationRepository.deleteRelation(companyUID, EntityType.CUSTOMER, customerId).also {
-            customerRepository.deleteCustomer(companyUID, customerId)
-        }
+        TODO("Not yet implemented")
     }
 }

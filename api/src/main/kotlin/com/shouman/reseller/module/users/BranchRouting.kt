@@ -23,7 +23,7 @@ fun Routing.branchRouting(branchController: BranchController) {
 
         val result = branchController.creatCompanyBranch(params.parent.uid, branch)
 
-        call.respond(result.toResponse())
+        call.respond(status = result.first, message = result.second)
     }
 
     get<Branches.Listing> { path ->
@@ -34,7 +34,7 @@ fun Routing.branchRouting(branchController: BranchController) {
             size = path.size
         )
 
-        call.respond(ServerResponse(body = result))
+        call.respond(status = result.first, message = result.second)
 
     }
 
@@ -44,14 +44,14 @@ fun Routing.branchRouting(branchController: BranchController) {
 
         val result = branchController.updateBranchInfo(path.parent.uid, path.branchId, putBranch)
 
-        call.respond(result.toResponse())
+        call.respond(status = result.first, message = result.second)
     }
 
     delete<Branches.Edit> { path ->
 
         val result = branchController.deleteCompanyBranchById(path.parent.uid, path.branchId)
 
-        call.respond(result.toResponse())
+        call.respond(status = result.first, message = result.second)
     }
 }
 

@@ -21,34 +21,34 @@ fun Routing.customerRouting(customerController: CustomerController) {
             customerController.addCustomer(parent.uid, branchId, salesmanId, postCustomer)
         }
 
-        call.respond(result.toResponse())
+        call.respond(status = result.first, result.second)
     }
 
     get<CustomerLocations.CompanyListing> { params ->
 
-        val customersList = with(params) {
+        val result = with(params) {
             customerController.getCompanyCustomers(parent.uid, lastId, size)
         }
 
-        call.respond(customersList)
+        call.respond(status = result.first, result.second)
     }
 
     get<CustomerLocations.BranchListing> { params ->
 
-        val customersList = with(params) {
+        val result = with(params) {
             customerController.getBranchCustomers(parent.uid, branchId, lastId, size)
         }
 
-        call.respond(customersList)
+        call.respond(status = result.first, result.second)
     }
 
     get<CustomerLocations.SalesmanListing> { params ->
 
-        val customersList = with(params) {
-            customerController.getSalesmanCustomers(parent.uid, branchId, salesmanId, lastId, size)
+        val result = with(params) {
+            customerController.getSalesmanCustomers(parent.uid, salesmanId, lastId, size)
         }
 
-        call.respond(customersList)
+        call.respond(status = result.first, result.second)
     }
 
 }
@@ -82,7 +82,6 @@ class CustomerLocations(val uid: String) {
     @Location("/salesmanListing")
     data class SalesmanListing(
         val parent: CustomerLocations,
-        val branchId: Int,
         val salesmanId: Int,
         val lastId: Int,
         val size: Int

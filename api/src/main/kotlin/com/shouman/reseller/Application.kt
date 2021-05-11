@@ -11,11 +11,13 @@ import com.shouman.reseller.data.di.DatabaseInjection
 import com.shouman.reseller.data.di.RepositoryInjection
 import com.shouman.reseller.di.ControllerInjection
 import com.shouman.reseller.domain.di.ServiceInjection
+import com.shouman.reseller.domain.entities.ServerResponse
 import com.shouman.reseller.domain.interfaces.DatabaseProvider
 import com.shouman.reseller.module.admin.adminCompanyRouting
 import com.shouman.reseller.module.users.*
 import io.ktor.application.*
 import io.ktor.features.*
+import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -25,8 +27,9 @@ import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
 
+typealias Response<T> = Pair<HttpStatusCode, ServerResponse<T>>
 
-fun main(args: Array<String>): Unit {
+fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
     FirebaseAppProvider.provideFirebaseApp()
 }

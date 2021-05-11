@@ -4,7 +4,12 @@ import com.shouman.reseller.domain.entities.*
 
 interface CustomerService {
 
-    fun createCustomer(customer: Customer, companyUID: String, branchId: Int, salesmanId: Int): Int
+    fun createCustomer(
+        newCustomer: PostCustomer,
+        companyUID: String,
+        branchId: Int,
+        salesmanId: Int
+    ): Pair<StatusCode, Int>
 
     fun getCustomerById(companyUID: String, customerId: Int): Customer?
 
@@ -12,11 +17,21 @@ interface CustomerService {
 
     fun getCustomerByPhoneNumber(companyUID: String, number: String): Customer?
 
-    fun getCompanyCustomers(uid: String, lastId: Int, size: Int): List<CompanyCustomer>
+    fun getCompanyCustomers(uid: String, lastId: Int, size: Int): Pair<StatusCode,List<CompanyCustomer>>
 
-    fun getBranchCustomers(branchId: Int, lastId: Int, size: Int): List<BranchCustomer>
+    fun getBranchCustomers(
+        companyUID: String,
+        branchId: Int,
+        lastId: Int,
+        size: Int
+    ): Pair<StatusCode, List<BranchCustomer>>
 
-    fun getSalesmanCustomers(salesmanId: Int, lastId: Int, size: Int): List<SalesmanCustomer>
+    fun getSalesmanCustomers(
+        companyUID: String,
+        salesmanId: Int,
+        lastId: Int,
+        size: Int
+    ): Pair<StatusCode, List<SalesmanCustomer>>
 
     fun updateCustomerInfo(companyUID: String, customerId: Int, putCustomer: PutCustomer): Boolean
 

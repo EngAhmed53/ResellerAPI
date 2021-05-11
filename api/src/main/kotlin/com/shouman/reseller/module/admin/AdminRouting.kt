@@ -25,7 +25,9 @@ fun Route.adminCompanyRouting(companyController: CompanyController) {
                 status = HttpStatusCode.BadRequest, message = "Missing or malformed uid"
             )
 
-            call.respond(companyController.disableCompany(uid).toResponse())
+            val result = companyController.disableCompany(uid)
+
+            call.respond(result)
         }
 
         post("{uid}/enable") {
@@ -35,7 +37,9 @@ fun Route.adminCompanyRouting(companyController: CompanyController) {
 
             val license = call.receive<License>()
 
-            call.respond(companyController.extendCompanyLicense(uid, license).toResponse())
+            val result = companyController.extendCompanyLicense(uid, license)
+
+            call.respond(result)
         }
     }
 }

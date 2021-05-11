@@ -1,42 +1,44 @@
 package com.shouman.reseller.controller
 
+import com.shouman.reseller.Response
 import com.shouman.reseller.domain.core.mappers.toResponseCompany
 import com.shouman.reseller.domain.entities.*
-import com.shouman.reseller.domain.entities.ResponseCode.*
+import com.shouman.reseller.domain.entities.StatusCode.*
 import com.shouman.reseller.domain.services.CompanyService
+import io.ktor.http.*
 
 class CompanyController(
     private val companyService: CompanyService
 ) : BaseController() {
 
-    suspend fun createCompany(company: Company): Result<String> = dbQuery {
+    suspend fun createCompany(company: Company): HttpStatusCode = dbQuery {
         companyService.getCompanyByUID(company.uid)?.let {
-            return@dbQuery Result.Error(ApiException(COMPANY_UID_ALREADY_TAKEN))
+            return@dbQuery HttpStatusCode.Conflict
         }
 
-        val uid = companyService.createCompany(company)
-        Result.Success(uid)
+        companyService.createCompany(company)
+        HttpStatusCode.Created
     }
 
-    suspend fun getCompanyInfo(uid: String): Result<ResponseCompany> = dbQuery {
+    suspend fun getCompanyInfo(uid: String): Response<ResponseCompany> = dbQuery {
         companyService.getCompanyByUID(uid)?.run {
-            Result.Success(toResponseCompany())
-        } ?: Result.Error(ApiException(COMPANY_UID_INVALID))
+            HttpStatusCode.OK to ServerResponse(body = toResponseCompany())
+        } ?: HttpStatusCode.NotFound to ServerResponse(statusCode = ERROR)
     }
 
-    suspend fun disableCompany(uid: String): Result<Boolean> = dbQuery {
+    suspend fun disableCompany(uid: String): HttpStatusCode = dbQuery {
         if (companyService.disableCompany(uid)) {
-            Result.Success(true)
+            HttpStatusCode.OK
         } else {
-            Result.Error(ApiException(COMPANY_DISABLED))
+            HttpStatusCode.BadRequest
         }
     }
 
-    suspend fun extendCompanyLicense(uid: String, license: License): Result<Boolean> = dbQuery {
+    suspend fun extendCompanyLicense(uid: String, license: License): HttpStatusCode = dbQuery {
         if (companyService.extendCompanyLicense(uid, license)) {
-            Result.Success(true)
+            HttpStatusCode.OK
         } else {
-            Result.Error(ApiException(COMPANY_LICENSE_EXTEND_ERROR))
+            HttpStatusCode.BadRequest
         }
     }
 }

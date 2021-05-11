@@ -1,10 +1,8 @@
 package com.shouman.reseller.data.datasource.database
 
+import com.shouman.reseller.data.datasource.database.dao.*
 import com.shouman.reseller.domain.interfaces.DatabaseProvider
-import com.shouman.reseller.data.datasource.database.dao.BranchDaoImpl
-import com.shouman.reseller.data.datasource.database.dao.CompanyDaoImpl
 import org.jetbrains.exposed.sql.SchemaUtils.create
-import com.shouman.reseller.data.datasource.database.dao.RelationDaoImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
@@ -23,7 +21,7 @@ class H2DatabaseProvider : DatabaseProvider, KoinComponent {
     override fun init() {
         Database.connect("jdbc:h2:~/database/reseller;AUTO_SERVER=TRUE", "org.h2.Driver")
         transaction {
-            create(RelationDaoImpl, CompanyDaoImpl, BranchDaoImpl)
+            create(RelationDaoImpl, CompanyDaoImpl, BranchDaoImpl, SalesmanDaoImpl, CustomerDaoImpl)
         }
     }
 

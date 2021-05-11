@@ -3,7 +3,7 @@ package com.shouman.reseller.domain.services
 import com.shouman.reseller.domain.entities.*
 
 interface SalesmanService {
-    fun createSalesman(companyUID: String, branchId: Int, salesman: Salesman): Int
+    fun createSalesman(companyUID: String, branchId: Int, postSalesman: PostSalesman): Pair<StatusCode, Int>
 
     fun getSalesmanById(id: Int): Salesman?
 
@@ -13,11 +13,16 @@ interface SalesmanService {
 
     fun getSalesmanByIMEI(imei: Long): Salesman?
 
-    fun getBranchSalesmen(branchId: Int, lastId: Int, size: Int): List<Salesman>
+    fun getBranchSalesmen(
+        companyUID: String,
+        branchId: Int,
+        lastId: Int,
+        size: Int
+    ): Pair<StatusCode, List<Salesman>>
 
-    fun getCompanySalesmen(companyUID: String, lastId: Int, size: Int): List<SalesmanBranch>
+    fun getCompanySalesmen(companyUID: String, lastId: Int, size: Int): Pair<StatusCode, List<SalesmanBranch>>
 
-    fun updateSalesman(salesmanId: Int, putSalesman: PutSalesman): Boolean
+    fun updateSalesman(companyUID: String, salesmanId: Int, putSalesman: PutSalesman): StatusCode
 
-    fun deleteSalesman(companyUID: String, salesmanId: Int): Boolean
+    fun deleteSalesman(companyUID: String, salesmanId: Int): StatusCode
 }

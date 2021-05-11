@@ -1,20 +1,22 @@
 package com.shouman.reseller.domain.services
 
-import com.shouman.reseller.domain.entities.Branch
-import com.shouman.reseller.domain.entities.EntityType
-import com.shouman.reseller.domain.entities.PutBranch
-import com.shouman.reseller.domain.entities.Relation
+import com.shouman.reseller.domain.entities.*
 import com.shouman.reseller.domain.repositories.BranchRepository
-import com.shouman.reseller.domain.repositories.RelationRepository
 
 internal class BranchServiceImpl(
-    private val relationRepository: RelationRepository,
+    private val companyService: CompanyService,
+    private val relationService: RelationService,
     private val branchRepository: BranchRepository
 ) : BranchService {
 
-    override fun createBranch(companyUID: String, branch: Branch): Int {
+    override fun createBranch(companyUid: String, branch: Branch): Int {
+
+        if (companyService.isCompanyEnabled(companyUid).not()) {
+            return -1
+        }
+
         return branchRepository.createBranch(branch).also {
-            relationRepository.createRelation(Relation(EntityType.BRANCH, companyUID, it))
+            relationService.addRelation(Relation(EntityType.BRANCH, companyUid, it))
         }
     }
 
@@ -22,18 +24,43 @@ internal class BranchServiceImpl(
         return branchRepository.getBranchById(id)
     }
 
-    override fun getCompanyBranches(companyUID: String, lastId: Int, size: Int): List<Branch> {
-        return branchRepository.getCompanyBranches(companyUID, lastId, size)
-    }
+    override fun getCompanyBranches(companyUID: String, lastId: Int, size: Int): Pair<StatusCode, List<Branch>> {
 
-    override fun updateBranch(companyUID: String, branchId: Int, putBranch: PutBranch): Boolean {
-        return branchRepository.updateBranchInfo(branchId, putBranch)
-    }
-
-    override fun deleteBranch(companyUID: String, branchId: Int): Boolean {
-        return relationRepository.deleteRelation(companyUID, EntityType.BRANCH, branchId).also {
-            if (it) branchRepository.deleteBranch(branchId)
+        if (relationService.isValidRelation(Relation(EntityType.COMPANY, companyId = companyUID)).not()) {
+            return StatusCode.INVALID_RELATION to emptyList()
         }
+
+        val branchesList = branchRepository.getCompanyBranches(companyUID, lastId, size)
+
+        return StatusCode.SUCCESS to branchesList
+    }
+
+    override fun updateBranch(companyUID: String, branchId: Int, putBranch: PutBranch): StatusCode {
+        if (relationService.isValidRelation(Relation(EntityType.BRANCH, companyUID, branchId)).not()) {
+            return StatusCode.INVALID_RELATION
+        }
+
+        val isUpdated = branchRepository.updateBranchInfo(branchId, putBranch)
+
+        return if (isUpdated) {
+            StatusCode.SUCCESS
+        } else {
+            StatusCode.UPDATE_ERROR
+        }
+    }
+
+    override fun deleteBranch(companyUID: String, branchId: Int): StatusCode {
+
+        if (relationService.isValidRelation(Relation(EntityType.BRANCH, companyUID, branchId)).not()) {
+            return StatusCode.INVALID_RELATION
+        }
+
+        val isDeleted =
+            branchRepository.takeIf { relationService.deleteRelation(companyUID, EntityType.BRANCH, branchId) }
+                ?.deleteBranch(branchId) ?: return StatusCode.DELETE_ERROR
+
+        return if (isDeleted) StatusCode.SUCCESS
+        else StatusCode.DELETE_ERROR
     }
 
 }

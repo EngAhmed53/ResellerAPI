@@ -7,3 +7,11 @@ data class Location(
     val latitude: Double,
     val longitude: Double
 )
+
+@Serializable
+data class LocationResponse(
+    val id: Int,
+    val latitude: Double,
+    val longitude: Double
+)
+
